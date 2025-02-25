@@ -4,8 +4,8 @@ import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
 dotenv.config();
 
 export default defineConfig({
-  entities: ['./dist/entities'],
-  entitiesTs: ['./src/entities'],
+  entities: ['./dist/entities/src/entities'],
+  entitiesTs: ['./src/entities/src/entities'],
   host: process.env.POSTGRES_HOST,
   dbName: process.env.POSTGRES_DB,
   port: Number(process.env.POSTGRES_PORT) || 5432,
@@ -21,8 +21,8 @@ export default defineConfig({
   autoJoinRefsForFilters: false,
   migrations: {
     tableName: 'mikro_orm_migrations',
-    path: './dist/entities/migrations',
-    pathTs: './src/entities/migrations',
+    path: './dist/entities/src/migrations',
+    pathTs: './src/entities/src/migrations',
     glob: '!(*.d).{js,ts}',
     transactional: true,
     disableForeignKeys: true,
