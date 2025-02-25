@@ -11,7 +11,7 @@ export class UserActivity extends CustomBaseEntity {
   @PrimaryKey({ type: 'uuid' })
   activity_id: string;
 
-  @Property()
+  @Property({ unique: true })
   date: string;
 
   @ManyToOne({

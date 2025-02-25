@@ -1,17 +1,22 @@
 import { PaginationDto } from '@dtos/pagination.dto';
-import { User } from '@entities/User';
-import { EntityRepository, wrap } from '@mikro-orm/core';
+import { User } from '@entities/src/entities/User';
+import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserActivity } from '@entities/src/entities/UserActivity';
+import { getTodayFormatted } from 'src/utils/date';
+import { CheckInDto } from './dto/user-check-in.dto';
+import { ActivityType } from '@constants/activityType.enum';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
+    @InjectRepository(UserActivity)
+    private readonly userActivityRepository: EntityRepository<UserActivity>,
     private em: EntityManager,
   ) {}
 
@@ -66,16 +71,21 @@ export class UserService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    const user = await this.findOne(id);
-    wrap(user).assign(updateUserDto);
-    await this.em.persistAndFlush(user);
-    return 'update user successfully';
-  }
+  async checkIn(data: CheckInDto) {
+    const user = await this.userRepository.findOneOrFail({ id: data.userId });
+    const today = getTodayFormatted();
+    const userCheckIn = await this.userActivityRepository.upsert(
+      {
+        user_id: user.id,
+        activity_id: ActivityType.CheckIn,
+        date: today,
+      },
+      {
+        onConflictFields: ['user_id', 'date'],
+        onConflictAction: 'merge',
+      },
+    );
 
-  async remove(id: string) {
-    const user = await this.findOne(id);
-    await this.em.removeAndFlush(user);
-    return 'delete user successfully';
+    return userCheckIn;
   }
 }
