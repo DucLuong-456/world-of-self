@@ -7,7 +7,7 @@ import { StoredImage } from './StoredImage';
 @Entity({ tableName: 'posts' })
 export class Post extends CustomBaseEntityWithDeletedAt {
   @Property()
-  image_id: string;
+  stored_image_id: string;
 
   @Property()
   title: string;
@@ -29,6 +29,11 @@ export class Post extends CustomBaseEntityWithDeletedAt {
   })
   user!: User;
 
-  @OneToOne(() => StoredImage, (image) => image.post, { owner: true })
+  @OneToOne({
+    entity: () => StoredImage,
+    nullable: true,
+    inversedBy: (storedImage) => storedImage.post,
+    joinColumn: 'stored_image_id',
+  })
   image: StoredImage;
 }

@@ -5,10 +5,10 @@ import { Activity } from './Activity';
 
 @Entity({ tableName: 'user_activities' })
 export class UserActivity extends CustomBaseEntity {
-  @PrimaryKey({ type: 'uuid', default: null })
+  @PrimaryKey({ type: 'uuid' })
   user_id: string;
 
-  @PrimaryKey({ type: 'uuid', default: null })
+  @PrimaryKey({ type: 'uuid' })
   activity_id: string;
 
   @Property()

@@ -10,6 +10,9 @@ export class StoredImage extends CustomBaseEntityWithDeletedAt {
   @Property()
   ext: string;
 
-  @OneToOne(() => Post, (post) => post.image)
+  @OneToOne({
+    entity: () => Post,
+    mappedBy: (post) => post.image,
+  })
   post: Post;
 }
