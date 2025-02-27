@@ -6,10 +6,13 @@ import * as dotenv from 'dotenv';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { User } from '@entities/User';
+import { MikroOrmModule } from '@mikro-orm/nestjs';
 dotenv.config();
 
 @Module({
   imports: [
+    MikroOrmModule.forFeature([User]),
     UserModule,
     PassportModule,
     JwtModule.register({

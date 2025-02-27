@@ -4,6 +4,7 @@ import { CustomBaseEntityWithDeletedAt } from './CustomBaseEntityWithDeletedAt';
 import { Post } from './Post';
 import { UserActivity } from './UserActivity';
 import { UserWeeklyRankings } from './UserWeeklyRanking';
+import { UserRelationship } from './UserRelationship';
 
 @Entity({ tableName: 'users' })
 export class User extends CustomBaseEntityWithDeletedAt {
@@ -42,4 +43,10 @@ export class User extends CustomBaseEntityWithDeletedAt {
     mappedBy: (userWeeklyRanking) => userWeeklyRanking.user,
   })
   userWeeklyRankings = new Collection<UserWeeklyRankings>(this);
+
+  @OneToMany({ entity: () => UserRelationship, mappedBy: (ur) => ur.user })
+  friends = new Collection<UserRelationship>(this);
+
+  @OneToMany({ entity: () => UserRelationship, mappedBy: (ur) => ur.friend })
+  users = new Collection<UserRelationship>(this);
 }

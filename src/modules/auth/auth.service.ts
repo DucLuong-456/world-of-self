@@ -5,7 +5,9 @@ import { omit } from 'lodash';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import bcrypt from 'bcrypt';
-import { EntityManager } from '@mikro-orm/postgresql';
+import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { User } from '@entities/User';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +15,8 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private readonly em: EntityManager,
+    @InjectRepository(User)
+    private readonly userRepository: EntityRepository<User>,
   ) {}
 
   async validateUser(loginDto: LoginDto): Promise<any> {
@@ -49,7 +53,7 @@ export class AuthService {
     }
 
     const hashPassword = await bcrypt.hash(registerDto.password, 10);
-    const newUser = await this.userService.create({
+    const newUser = this.userRepository.create({
       ...registerDto,
       password: hashPassword,
     });
