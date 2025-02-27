@@ -1,6 +1,7 @@
 import { defineConfig } from '@mikro-orm/postgresql';
 import * as dotenv from 'dotenv';
 import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
+import { SeedManager } from '@mikro-orm/seeder';
 dotenv.config();
 
 export default defineConfig({
@@ -11,7 +12,7 @@ export default defineConfig({
   port: Number(process.env.POSTGRES_PORT) || 5432,
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
-  extensions: [Migrator],
+  extensions: [Migrator, SeedManager],
   allowGlobalContext: false,
   autoJoinOneToOneOwner: false,
   ignoreUndefinedInQuery: true,
@@ -32,5 +33,13 @@ export default defineConfig({
     snapshot: true,
     emit: 'ts',
     generator: TSMigrationGenerator,
+  },
+  seeder: {
+    path: './dist/entities/src/seeders', // path to the folder with seeders
+    pathTs: './src/entities/src/seeders', // path to the folder with TS seeders (if used, you should put path to compiled files in `path`)
+    defaultSeeder: 'DatabaseSeeder', // default seeder class name
+    glob: '!(*.d).{js,ts}', // how to match seeder files (all .js and .ts files, but not .d.ts)
+    emit: 'ts', // seeder generation mode
+    fileName: (className: string) => className, // seeder file naming convention
   },
 });

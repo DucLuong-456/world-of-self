@@ -44,6 +44,7 @@
           "primary": false,
           "nullable": true,
           "length": 6,
+          "default": "null",
           "mappedType": "datetime"
         },
         "score": {
@@ -64,7 +65,8 @@
           "nullable": false,
           "enumItems": [
             "post",
-            "invite_friend"
+            "invite_friend",
+            "check_in"
           ],
           "mappedType": "enum"
         }
@@ -127,6 +129,7 @@
           "primary": false,
           "nullable": true,
           "length": 6,
+          "default": "null",
           "mappedType": "datetime"
         },
         "path": {
@@ -208,6 +211,7 @@
           "primary": false,
           "nullable": true,
           "length": 6,
+          "default": "null",
           "mappedType": "datetime"
         },
         "user_name": {
@@ -333,6 +337,7 @@
           "primary": false,
           "nullable": true,
           "length": 6,
+          "default": "null",
           "mappedType": "datetime"
         },
         "stored_image_id": {
@@ -507,6 +512,16 @@
       "schema": "public",
       "indexes": [
         {
+          "columnNames": [
+            "date"
+          ],
+          "composite": false,
+          "keyName": "user_activities_date_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
           "keyName": "user_activities_pkey",
           "columnNames": [
             "user_id",
@@ -553,23 +568,21 @@
       "columns": {
         "user_id": {
           "name": "user_id",
-          "type": "varchar(255)",
+          "type": "uuid",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 255,
-          "mappedType": "string"
+          "mappedType": "uuid"
         },
         "friend_id": {
           "name": "friend_id",
-          "type": "varchar(255)",
+          "type": "uuid",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 255,
-          "mappedType": "string"
+          "mappedType": "uuid"
         },
         "created_at": {
           "name": "created_at",
@@ -593,17 +606,14 @@
         },
         "status": {
           "name": "status",
-          "type": "text",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "enumItems": [
-            "pending",
-            "accepted",
-            "rejected"
-          ],
-          "mappedType": "enum"
+          "length": 255,
+          "default": "'pending'",
+          "mappedType": "string"
         },
         "deleted_at": {
           "name": "deleted_at",
@@ -613,6 +623,7 @@
           "primary": false,
           "nullable": true,
           "length": 6,
+          "default": "null",
           "mappedType": "datetime"
         }
       },
@@ -632,7 +643,34 @@
         }
       ],
       "checks": [],
-      "foreignKeys": {},
+      "foreignKeys": {
+        "user_relationships_user_id_foreign": {
+          "constraintName": "user_relationships_user_id_foreign",
+          "columnNames": [
+            "user_id"
+          ],
+          "localTableName": "public.user_relationships",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.users",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "user_relationships_friend_id_foreign": {
+          "constraintName": "user_relationships_friend_id_foreign",
+          "columnNames": [
+            "friend_id"
+          ],
+          "localTableName": "public.user_relationships",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.users",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     },
     {
@@ -684,6 +722,7 @@
           "primary": false,
           "nullable": true,
           "length": 6,
+          "default": "null",
           "mappedType": "datetime"
         },
         "start_date": {

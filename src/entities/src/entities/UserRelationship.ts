@@ -1,6 +1,7 @@
-import { Entity, Enum, PrimaryKey, Property } from '@mikro-orm/core';
-import { CustomBaseEntity } from './CustomBaseEntity';
 import { FriendshipStatus } from '@constants/friendshipStatus';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { CustomBaseEntity } from './CustomBaseEntity';
+import { User } from './User';
 
 @Entity({ tableName: 'user_relationships' })
 export class UserRelationship extends CustomBaseEntity {
@@ -12,9 +13,29 @@ export class UserRelationship extends CustomBaseEntity {
   @Property({ type: 'uuid' })
   friend_id: string;
 
-  @Enum(() => FriendshipStatus)
+  @Property({
+    type: 'varchar',
+    default: FriendshipStatus.PENDING,
+    nullable: false,
+  })
   status: FriendshipStatus;
 
-  @Property({ type: 'timestamp', nullable: true })
-  deletedAt = new Date();
+  @Property({ type: 'timestamp', nullable: true, default: null })
+  deletedAt: Date | null;
+
+  @ManyToOne({
+    entity: () => User,
+    nullable: true,
+    inversedBy: (user) => user.friends,
+    joinColumn: 'user_id',
+  })
+  user!: User;
+
+  @ManyToOne({
+    entity: () => User,
+    nullable: true,
+    inversedBy: (user) => user.users,
+    joinColumn: 'friend_id',
+  })
+  friend!: User;
 }

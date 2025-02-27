@@ -1,14 +1,13 @@
-import { PaginationDto } from '@dtos/pagination.dto';
-import { User } from '@entities/src/entities/User';
+import { ActivityType } from '@constants/activityType.enum';
+import { User } from '@entities/User';
+import { UserActivity } from '@entities/UserActivity';
+import { UserRelationship } from '@entities/UserRelationship';
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UserActivity } from '@entities/src/entities/UserActivity';
 import { getTodayFormatted } from 'src/utils/date';
 import { CheckInDto } from './dto/user-check-in.dto';
-import { ActivityType } from '@constants/activityType.enum';
 
 @Injectable()
 export class UserService {
@@ -17,51 +16,10 @@ export class UserService {
     private readonly userRepository: EntityRepository<User>,
     @InjectRepository(UserActivity)
     private readonly userActivityRepository: EntityRepository<UserActivity>,
+    @InjectRepository(UserRelationship)
+    private readonly userRelationshipRepository: EntityRepository<UserRelationship>,
     private em: EntityManager,
   ) {}
-
-  async create(createUserDto: CreateUserDto) {
-    const user = await this.userRepository.findOne({
-      email: createUserDto.email,
-    });
-    if (user) {
-      throw new NotFoundException('user already exists');
-    }
-
-    const newUser = this.userRepository.create(createUserDto);
-    await this.em.persistAndFlush(newUser);
-
-    return newUser;
-  }
-
-  async findAll(data: PaginationDto) {
-    const limit = data?.limit || 5;
-    const page = data?.page || 1;
-    const [users, totalCount] = await this.userRepository.findAndCount(
-      {},
-      {
-        limit: limit,
-        offset: (page - 1) * limit,
-      },
-    );
-
-    return {
-      users,
-      paging: {
-        limit: limit,
-        page: page,
-        totalCount,
-      },
-    };
-  }
-
-  async findOne(id: string) {
-    const user = await this.userRepository.findOne(id);
-    if (!user) {
-      throw new NotFoundException('user already exists');
-    }
-    return user;
-  }
 
   async findByEmail(email: string) {
     const user = await this.userRepository.findOne({ email });

@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import config from './mikro-orm.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
+import { UsersModule } from './modules/users/users.module';
 import { QueueName } from './queue/queueName.enum';
 
 @Module({
@@ -24,6 +25,7 @@ import { QueueName } from './queue/queueName.enum';
     BullModule.registerQueue({
       name: QueueName.ExportQueue,
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
