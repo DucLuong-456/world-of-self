@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { UsersModule } from './modules/users/users.module';
 import { QueueName } from './queue/queueName.enum';
+import { PostsModule } from './modules/posts/posts.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { QueueName } from './queue/queueName.enum';
       name: QueueName.ExportQueue,
     }),
     UsersModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

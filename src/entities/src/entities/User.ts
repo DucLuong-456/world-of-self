@@ -1,10 +1,11 @@
 import { UserRole } from '@constants/userRole.enum';
-import { Collection, Entity, Enum, OneToMany, Property } from '@mikro-orm/core';
+import { Collection, Entity, OneToMany, Property } from '@mikro-orm/core';
 import { CustomBaseEntityWithDeletedAt } from './CustomBaseEntityWithDeletedAt';
 import { Post } from './Post';
 import { UserActivity } from './UserActivity';
-import { UserWeeklyRankings } from './UserWeeklyRanking';
 import { UserRelationship } from './UserRelationship';
+import { UserWeeklyRankings } from './UserWeeklyRanking';
+import { PostReact } from './PostReact';
 
 @Entity({ tableName: 'users' })
 export class User extends CustomBaseEntityWithDeletedAt {
@@ -14,16 +15,16 @@ export class User extends CustomBaseEntityWithDeletedAt {
   @Property()
   email: string;
 
-  @Property()
+  @Property({ nullable: true, default: null })
   phone: string;
 
   @Property()
   password: string;
 
-  @Property()
+  @Property({ nullable: true, default: null })
   avatar: string;
 
-  @Enum(() => UserRole)
+  @Property({ type: 'varchar', default: UserRole.User })
   role: UserRole;
 
   @OneToMany({
@@ -49,4 +50,10 @@ export class User extends CustomBaseEntityWithDeletedAt {
 
   @OneToMany({ entity: () => UserRelationship, mappedBy: (ur) => ur.friend })
   users = new Collection<UserRelationship>(this);
+
+  @OneToMany({
+    entity: () => PostReact,
+    mappedBy: (post_react) => post_react.user,
+  })
+  post_react = new Collection<PostReact>(this);
 }

@@ -1,8 +1,16 @@
 import { PostCategory } from '@constants/postCategory';
-import { Entity, Enum, ManyToOne, OneToOne, Property } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  Property,
+} from '@mikro-orm/core';
 import { CustomBaseEntityWithDeletedAt } from './CustomBaseEntityWithDeletedAt';
-import { User } from './User';
 import { StoredImage } from './StoredImage';
+import { User } from './User';
+import { PostReact } from './PostReact';
 
 @Entity({ tableName: 'posts' })
 export class Post extends CustomBaseEntityWithDeletedAt {
@@ -12,13 +20,13 @@ export class Post extends CustomBaseEntityWithDeletedAt {
   @Property()
   title: string;
 
-  @Property()
+  @Property({ type: 'int', default: 0 })
   react_count: number;
 
   @Property()
   user_id: string;
 
-  @Enum(() => PostCategory)
+  @Property({ type: 'varchar', nullable: true, default: null })
   category: PostCategory;
 
   @ManyToOne({
@@ -36,4 +44,10 @@ export class Post extends CustomBaseEntityWithDeletedAt {
     joinColumn: 'stored_image_id',
   })
   image: StoredImage;
+
+  @OneToMany({
+    entity: () => PostReact,
+    mappedBy: (post_react) => post_react.post,
+  })
+  post_react = new Collection<PostReact>(this);
 }

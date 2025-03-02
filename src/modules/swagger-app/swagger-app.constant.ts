@@ -1,3 +1,3 @@
 export enum appSwaggerTag {
-  user = 'users',
+  user = 'user',
 }
