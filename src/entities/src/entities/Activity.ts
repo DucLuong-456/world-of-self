@@ -1,5 +1,5 @@
 import { ActivityType } from '@constants/activityType.enum';
-import { Collection, Entity, Enum, OneToMany, Property } from '@mikro-orm/core';
+import { Collection, Entity, OneToMany, Property } from '@mikro-orm/core';
 import { CustomBaseEntityWithDeletedAt } from './CustomBaseEntityWithDeletedAt';
 import { UserActivity } from './UserActivity';
 
@@ -8,7 +8,7 @@ export class Activity extends CustomBaseEntityWithDeletedAt {
   @Property()
   score: number;
 
-  @Enum(() => ActivityType)
+  @Property({ type: 'varchar', nullable: true, default: null })
   type: ActivityType;
 
   @OneToMany({

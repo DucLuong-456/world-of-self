@@ -5,7 +5,7 @@ import { UserRelationship } from '@entities/UserRelationship';
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager } from '@mikro-orm/postgresql';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { getTodayFormatted } from 'src/utils/date';
 import { CheckInDto } from './dto/user-check-in.dto';
 
@@ -23,9 +23,6 @@ export class UserService {
 
   async findByEmail(email: string) {
     const user = await this.userRepository.findOne({ email });
-    if (!user) {
-      throw new NotFoundException('user is not found');
-    }
     return user;
   }
 

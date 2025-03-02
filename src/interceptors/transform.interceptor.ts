@@ -45,13 +45,13 @@ export class TransformInterceptor<T>
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((data) => {
-        if (data instanceof BaseResponse) {
-          return data;
-        } else {
+        if (data instanceof PagingResponse) {
           return {
             data: data.data,
             paging: data.paging,
           };
+        } else {
+          return data;
         }
       }),
     );

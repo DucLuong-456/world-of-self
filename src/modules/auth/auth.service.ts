@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { omit } from 'lodash';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from '@entities/User';
@@ -22,7 +22,11 @@ export class AuthService {
   async validateUser(loginDto: LoginDto): Promise<any> {
     const user = await this.userService.findByEmail(loginDto.email);
 
-    if (bcrypt.compare(loginDto.password, user.password)) {
+    const isCorrectPassword = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
+    if (isCorrectPassword) {
       const result = omit(user, ['password']);
       return result;
     } else {
@@ -35,14 +39,13 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = await this.validateUser(loginDto);
-    const payload = user;
     const jwtOptions = {
       expiresIn: process.env.EXPIRE_TIME,
       secret: process.env.SECRET_KEY,
     };
 
     return {
-      access_token: await this.jwtService.signAsync(payload, jwtOptions),
+      access_token: await this.jwtService.signAsync(user, jwtOptions),
     };
   }
 
@@ -53,6 +56,7 @@ export class AuthService {
     }
 
     const hashPassword = await bcrypt.hash(registerDto.password, 10);
+
     const newUser = this.userRepository.create({
       ...registerDto,
       password: hashPassword,

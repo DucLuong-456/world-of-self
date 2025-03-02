@@ -8,7 +8,10 @@ export class SwaggerAppModule {
       .setTitle('tracking-personal api')
       .setDescription('FPT console API documents')
       .setVersion('1.0')
-      .addBearerAuth();
+      .addBearerAuth(
+        { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, // Cấu hình Bearer Auth
+        'JWT-auth',
+      );
 
     const config = initialConfig.build();
     const document = SwaggerModule.createDocument(app, config);
