@@ -1,13 +1,14 @@
+import { User } from '@entities/User';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 import { UserService } from '@modules/user/user.service';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { omit } from 'lodash';
+import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import * as bcrypt from 'bcrypt';
-import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
-import { InjectRepository } from '@mikro-orm/nestjs';
-import { User } from '@entities/User';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly em: EntityManager,
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async validateUser(loginDto: LoginDto): Promise<any> {
@@ -27,8 +29,7 @@ export class AuthService {
       user.password,
     );
     if (isCorrectPassword) {
-      const result = omit(user, ['password']);
-      return result;
+      return user;
     } else {
       throw new HttpException(
         'Thông tin đăng nhập không chính xác!',
@@ -44,8 +45,9 @@ export class AuthService {
       secret: process.env.SECRET_KEY,
     };
 
+    const payload = { id: user.id, email: user.email, role: user.role };
     return {
-      access_token: await this.jwtService.signAsync(user, jwtOptions),
+      access_token: await this.jwtService.signAsync(payload, jwtOptions),
     };
   }
 
@@ -64,5 +66,14 @@ export class AuthService {
     await this.em.persistAndFlush(newUser);
 
     return newUser;
+  }
+
+  async logout(token: string): Promise<void> {
+    const decoded = this.jwtService.decode(token) as { exp: number };
+    const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+
+    if (ttl > 0) {
+      await this.cacheManager.set(`blacklist:${token}`, 'true', ttl);
+    }
   }
 }

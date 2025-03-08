@@ -10,11 +10,16 @@ import { UserModule } from './modules/user/user.module';
 import { UsersModule } from './modules/users/users.module';
 import { QueueName } from './queue/queueName.enum';
 import { PostsModule } from './modules/posts/posts.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
     UserModule,
     MikroOrmModule.forRoot(config),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 3600,
+    }),
     AuthModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     BullModule.forRoot({
