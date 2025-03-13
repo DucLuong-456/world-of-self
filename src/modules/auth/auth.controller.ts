@@ -32,7 +32,7 @@ export class AuthController {
 
     await this.authService.logout(token);
     return {
-      message: 'Đăng xuất thành công',
+      message: 'logout successfully',
       timestamp: new Date().toISOString(),
     };
   }

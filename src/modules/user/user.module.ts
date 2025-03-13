@@ -1,3 +1,5 @@
+import { Activity } from '@entities/Activity';
+import { DailyScore } from '@entities/DailyScore';
 import { User } from '@entities/User';
 import { UserActivity } from '@entities/UserActivity';
 import { UserRelationship } from '@entities/UserRelationship';
@@ -7,7 +9,15 @@ import { UserService } from '@modules/user/user.service';
 import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([User, UserActivity, UserRelationship])],
+  imports: [
+    MikroOrmModule.forFeature([
+      User,
+      UserActivity,
+      UserRelationship,
+      Activity,
+      DailyScore,
+    ]),
+  ],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],

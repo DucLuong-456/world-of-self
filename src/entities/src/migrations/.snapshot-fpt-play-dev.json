@@ -24,6 +24,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -34,6 +35,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "deleted_at": {
@@ -98,6 +100,15 @@
           "default": "null",
           "mappedType": "uuid"
         },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz",
@@ -106,6 +117,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -116,6 +128,91 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
+          "mappedType": "datetime"
+        },
+        "date": {
+          "name": "date",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "total_points": {
+          "name": "total_points",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "integer"
+        }
+      },
+      "name": "daily_scores",
+      "schema": "public",
+      "indexes": [
+        {
+          "columnNames": [
+            "date"
+          ],
+          "composite": false,
+          "keyName": "daily_scores_date_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "keyName": "daily_scores_pkey",
+          "columnNames": [
+            "id",
+            "user_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "null",
+          "mappedType": "uuid"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "'now()'",
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "deleted_at": {
@@ -188,6 +285,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -198,6 +296,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "deleted_at": {
@@ -313,6 +412,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -323,6 +423,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "deleted_at": {
@@ -479,6 +580,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -489,6 +591,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         }
       },
@@ -566,6 +669,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -576,6 +680,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "date": {
@@ -673,6 +778,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -683,6 +789,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "status": {
@@ -783,6 +890,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -793,6 +901,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "'now()'",
           "mappedType": "datetime"
         },
         "deleted_at": {
@@ -806,8 +915,8 @@
           "default": "null",
           "mappedType": "datetime"
         },
-        "start_date": {
-          "name": "start_date",
+        "week_start_date": {
+          "name": "week_start_date",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -816,8 +925,18 @@
           "length": 255,
           "mappedType": "string"
         },
-        "total_score": {
-          "name": "total_score",
+        "week_end_date": {
+          "name": "week_end_date",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "total_weekly_points": {
+          "name": "total_weekly_points",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,
@@ -825,8 +944,8 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "rank": {
-          "name": "rank",
+        "ranking": {
+          "name": "ranking",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,

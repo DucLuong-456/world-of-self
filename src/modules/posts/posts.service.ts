@@ -9,6 +9,12 @@ import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { CreatePostDto } from './dto/create-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
+import { DailyScore } from '@entities/DailyScore';
+import {
+  getEndOfDate,
+  getStartOfDate,
+  getTodayFormatted,
+} from 'src/utils/date';
 
 @Injectable()
 export class PostsService {
@@ -19,6 +25,8 @@ export class PostsService {
     private readonly postRepository: EntityRepository<Post>,
     @InjectRepository(PostReact)
     private readonly postReactRepository: EntityRepository<PostReact>,
+    @InjectRepository(DailyScore)
+    private readonly dailyScoreRepository: EntityRepository<DailyScore>,
     private em: EntityManager,
     @Inject(REQUEST) protected request: Request,
   ) {}
@@ -66,6 +74,14 @@ export class PostsService {
 
   async create(data: CreatePostDto) {
     const userId = (this.request.user as User)?.id;
+    const today = getTodayFormatted();
+    const startOfToday = getStartOfDate();
+    const endOfToday = getEndOfDate();
+
+    const dailyScore = await this.dailyScoreRepository.findOneOrFail({
+      user_id: userId,
+      date: today,
+    });
 
     let storedImage: StoredImage;
     if (data.image_metadata) {
@@ -84,6 +100,16 @@ export class PostsService {
       image: storedImage,
     });
     await this.em.persistAndFlush(post);
+
+    const postCountToday = await this.postRepository.count({
+      createdAt: {
+        $gte: startOfToday,
+        $lte: endOfToday,
+      },
+    });
+    if (postCountToday <= 3) {
+      dailyScore.total_points = dailyScore.total_points + 30;
+    }
 
     return post;
   }

@@ -9,13 +9,16 @@ export class UserWeeklyRankings extends CustomBaseEntityWithDeletedAt {
   user_id: string;
 
   @Property()
-  start_date: string;
+  week_start_date: string;
 
   @Property()
-  total_score: number;
+  week_end_date: string;
 
   @Property()
-  rank: number;
+  total_weekly_points: number;
+
+  @Property()
+  ranking: number;
 
   @Enum(() => UserWeeklyRankStatus)
   status: UserWeeklyRankStatus;

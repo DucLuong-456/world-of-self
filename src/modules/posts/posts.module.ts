@@ -5,9 +5,10 @@ import { Post } from '@entities/Post';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { User } from '@entities/User';
 import { PostReact } from '@entities/PostReact';
+import { DailyScore } from '@entities/DailyScore';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([User, Post, PostReact])],
+  imports: [MikroOrmModule.forFeature([User, Post, PostReact, DailyScore])],
   controllers: [PostsController],
   providers: [PostsService],
 })

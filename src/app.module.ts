@@ -11,6 +11,8 @@ import { UsersModule } from './modules/users/users.module';
 import { QueueName } from './queue/queueName.enum';
 import { PostsModule } from './modules/posts/posts.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { TasksModule } from './modules/tasks/tasks.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { CacheModule } from '@nestjs/cache-manager';
       isGlobal: true,
       ttl: 3600,
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     BullModule.forRoot({
@@ -33,6 +36,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     }),
     UsersModule,
     PostsModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -32,7 +32,7 @@ export class AuthService {
       return user;
     } else {
       throw new HttpException(
-        'Thông tin đăng nhập không chính xác!',
+        'Information login not correct!',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -54,7 +54,7 @@ export class AuthService {
   async register(registerDto: RegisterDto) {
     const user = await this.userService.findByEmail(registerDto.email);
     if (user) {
-      throw new HttpException('Email đã tồn tại!', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Email exists!', HttpStatus.BAD_REQUEST);
     }
 
     const hashPassword = await bcrypt.hash(registerDto.password, 10);
