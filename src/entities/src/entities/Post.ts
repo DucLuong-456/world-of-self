@@ -15,9 +15,6 @@ import { PostReact } from './PostReact';
 @Entity({ tableName: 'posts' })
 export class Post extends CustomBaseEntityWithDeletedAt {
   @Property()
-  stored_image_id: string;
-
-  @Property()
   title: string;
 
   @Property({ type: 'int', default: 0 })
@@ -28,6 +25,9 @@ export class Post extends CustomBaseEntityWithDeletedAt {
 
   @Property({ type: 'varchar', nullable: true, default: null })
   category: PostCategory;
+
+  @Property()
+  stored_image_id: string;
 
   @ManyToOne({
     entity: () => User,

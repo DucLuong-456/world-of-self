@@ -54,14 +54,16 @@ export class AuthService {
   async register(registerDto: RegisterDto) {
     const user = await this.userService.findByEmail(registerDto.email);
     if (user) {
-      throw new HttpException('Email đã tồn tại!', HttpStatus.BAD_REQUEST);
+      throw new HttpException('email already exists!', HttpStatus.BAD_REQUEST);
     }
 
+    const avatar = registerDto?.avatar?.originalname;
     const hashPassword = await bcrypt.hash(registerDto.password, 10);
 
     const newUser = this.userRepository.create({
       ...registerDto,
       password: hashPassword,
+      avatar,
     });
     await this.em.persistAndFlush(newUser);
 

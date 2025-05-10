@@ -1,13 +1,12 @@
-import { UserRole } from '@constants/userRole.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
+import { Express } from 'express';
 
 export class RegisterDto {
   @ApiProperty()
@@ -27,17 +26,16 @@ export class RegisterDto {
   password: string;
 
   @ApiProperty()
-  @IsEnum(UserRole)
-  @IsOptional()
-  role?: UserRole;
-
-  @ApiProperty()
   @IsString()
   @IsOptional()
   phone?: string;
 
-  @ApiProperty()
-  @IsString()
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    nullable: true,
+    required: false,
+  })
   @IsOptional()
-  avatar?: string;
+  avatar?: Express.Multer.File | null;
 }
