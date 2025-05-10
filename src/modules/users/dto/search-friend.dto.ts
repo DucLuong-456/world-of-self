@@ -4,5 +4,5 @@ import { IsOptional, IsString } from 'class-validator';
 export class SearchFriendDto extends PaginationDto {
   @IsOptional()
   @IsString()
-  keyword: string;
+  q: string;
 }
