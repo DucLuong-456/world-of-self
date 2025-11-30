@@ -4,7 +4,7 @@ import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 import { UserService } from '@modules/user/user.service';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -23,6 +23,7 @@ export class AuthService {
 
   async validateUser(loginDto: LoginDto): Promise<any> {
     const user = await this.userService.findByEmail(loginDto.email);
+    // console.log('user=====', loginDto);
 
     const isCorrectPassword = await bcrypt.compare(
       loginDto.password,

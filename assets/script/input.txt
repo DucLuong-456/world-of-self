@@ -1,0 +1,17 @@
+const { Transform } = require('stream');
+
+const upperCaseTransform = new Transform({
+  transform(chunk, encoding, callback) {
+    // Chuyển chunk sang chữ in hoa
+    const upperChunk = chunk.toString().toUpperCase();
+    this.push(upperChunk);
+    callback();
+  }
+});
+
+// Dùng với pipe
+const fs = require('fs');
+
+fs.createReadStream('input.txt')
+  .pipe(upperCaseTransform)
+  .pipe(fs.createWriteStream('output-uppercase.txt'));

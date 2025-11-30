@@ -11,6 +11,7 @@ import { UsersModule } from './modules/users/users.module';
 import { QueueName } from './queue/queueName.enum';
 import { PostsModule } from './modules/posts/posts.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { VideosModule } from './modules/videos/videos.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     }),
     UsersModule,
     PostsModule,
+    VideosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

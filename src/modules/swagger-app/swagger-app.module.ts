@@ -5,7 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 export class SwaggerAppModule {
   static setup(app: INestApplication) {
     const initialConfig = new DocumentBuilder()
-      .setTitle('tracking-personal api')
+      .setTitle('instagram-beta api')
       .setDescription('FPT console API documents')
       .setVersion('1.0')
       .addBearerAuth(

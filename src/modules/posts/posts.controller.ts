@@ -23,6 +23,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
+
   @Get()
   getPosts(@Query() data: SearchPostDto) {
     return this.postsService.getPosts(data);

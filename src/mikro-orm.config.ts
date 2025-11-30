@@ -2,10 +2,15 @@ import { defineConfig } from '@mikro-orm/postgresql';
 import * as dotenv from 'dotenv';
 import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
 import { SeedManager } from '@mikro-orm/seeder';
+import { User } from '@entities/User';
+import { Post } from '@nestjs/common';
+import { PostReact } from '@entities/PostReact';
+import { StoredImage } from '@entities/StoredImage';
+import { UserRelationship } from '@entities/UserRelationship';
 dotenv.config();
 
 export default defineConfig({
-  entities: ['./dist/entities/src/entities'],
+  entities: [User, Post, PostReact, StoredImage, UserRelationship],
   entitiesTs: ['./src/entities/src/entities'],
   host: process.env.POSTGRES_HOST,
   dbName: process.env.POSTGRES_DB,
