@@ -1,6 +1,4 @@
 import { UserRole } from '@constants/userRole.enum';
-import { JwtAuthGuard } from '@modules/auth/guard/jwt-auth.guard';
-import { RolesGuard } from '@modules/auth/guard/role.guard';
 import {
   Body,
   Controller,
@@ -9,17 +7,13 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
-import { ApiAuthUser } from 'src/decorators/api-auth-user.decorator';
-import { Roles } from 'src/decorators/role.decorator';
+import { Auth } from 'src/decorators/auth.decorator';
+import { CreatePostDto } from './dto/create-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
 import { PostsService } from './posts.service';
-import { CreatePostDto } from './dto/create-post.dto';
 
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.User)
-@ApiAuthUser()
+@Auth(UserRole.User)
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}

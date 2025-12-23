@@ -1,49 +1,22 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { ExecutionContext, Inject, Injectable } from '@nestjs/common';
-import { UnauthorizedException } from '@nestjs/common/exceptions';
-import { JwtService } from '@nestjs/jwt';
+import { CookieKey } from '@constants/auth.enum';
+import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Cache } from 'cache-manager';
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { parse } from 'cookie';
+import { Request } from 'express';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(
-    private jwtService: JwtService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {
-    super();
-  }
+export class JwtAuthGuard extends AuthGuard('jwt') {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+export const extractTokenFromCookie = (
+  request: Request,
+  options: { type: CookieKey } = { type: CookieKey.ACCESS_TOKEN },
+): string | undefined => {
+  const cookie = parse(request.headers.cookie ?? '');
 
-    if (!token) {
-      throw new UnauthorizedException('Không tìm thấy token');
-    }
-
-    const isBlacklisted = await this.cacheManager.get(`blacklist:${token}`);
-
-    if (isBlacklisted) {
-      throw new UnauthorizedException('Token đã bị thu hồi');
-    }
-
-    try {
-      const payload = await this.jwtService.verify(token, {
-        secret: process.env.SECRET_KEY,
-      });
-
-      request['user'] = payload;
-      return true;
-    } catch {
-      throw new UnauthorizedException('Token không hợp lệ');
-    }
-  }
-
-  private extractTokenFromHeader(request: any): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
-  }
-}
+  return (
+    (request &&
+      (cookie[options.type] ||
+        request.headers?.authorization?.split(' ')[1])) ??
+    ''
+  );
+};

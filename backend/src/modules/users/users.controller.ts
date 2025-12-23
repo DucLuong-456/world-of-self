@@ -5,7 +5,10 @@ import {
 } from 'src/interceptors/transform.interceptor';
 import { GetUsersDto } from './dto/get-users.dto';
 import { UsersService } from './users.service';
+import { UserRole } from '@constants/userRole.enum';
+import { Auth } from 'src/decorators/auth.decorator';
 
+@Auth(UserRole.User)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
