@@ -23,10 +23,13 @@ import {
 import Link from "next/link";
 import { Loader2, Chrome, Github } from "lucide-react";
 import * as z from "zod";
+import { useRegisterMutation } from "@/hooks/user/useRegisterMutation";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export const RegisterSchema = z
   .object({
-    username: z
+    user_name: z
       .string()
       .min(3, {
         message: "Tên người dùng phải có ít nhất 3 ký tự.",
@@ -53,24 +56,29 @@ export const RegisterSchema = z
 export type RegisterFormData = z.infer<typeof RegisterSchema>;
 
 export default function RegisterPage() {
+  const route = useRouter();
+
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
-      username: "",
+      user_name: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
   });
 
+  const { mutateAsync, isPending } = useRegisterMutation();
+
   const onSubmit = async (data: RegisterFormData) => {
-    // Xử lý Đăng ký bằng Email/Mật khẩu
-    console.log("Dữ liệu đăng ký đã xác thực:", data);
-
-    // Giả lập trạng thái loading khi đang gửi dữ liệu
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Xử lý logic đăng ký thành công/thất bại tại đây
+    try {
+      const { password, email, user_name } = data;
+      const body = { password, email, user_name };
+      await mutateAsync(body);
+      route.push("/login");
+    } catch {
+      toast.error("Đăng ký không thành công. Vui lòng thử lại.");
+    }
   };
 
   // Hàm xử lý Đăng ký bằng Social (Duy trì tính nhất quán giao diện)
@@ -79,7 +87,7 @@ export default function RegisterPage() {
     // Ở đây bạn sẽ gọi API để bắt đầu luồng OAuth2
   };
 
-  const isSubmitting = form.formState.isSubmitting;
+  const isSubmitting = form.formState.isSubmitting || isPending;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
@@ -129,7 +137,7 @@ export default function RegisterPage() {
               {/* Trường Tên người dùng (Username) */}
               <FormField
                 control={form.control}
-                name="username"
+                name="user_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tên người dùng</FormLabel>

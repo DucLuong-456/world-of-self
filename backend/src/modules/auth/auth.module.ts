@@ -1,14 +1,13 @@
 import { UserModule } from '@modules/user/user.module';
 import { Module } from '@nestjs/common';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import * as dotenv from 'dotenv';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { User } from '@entities/User';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-dotenv.config();
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -16,12 +15,11 @@ dotenv.config();
     UserModule,
     PassportModule,
     JwtModule.register({
-      global: true,
       secret: process.env.SECRET_KEY,
-      signOptions: { expiresIn: process.env.EXPIRE_TIME },
+      signOptions: { expiresIn: process.env.EXPIRE_TIME_ACCESS_TOKEN },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard],
 })
 export class AuthModule {}

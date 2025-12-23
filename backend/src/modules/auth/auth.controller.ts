@@ -5,6 +5,8 @@ import {
   MaxFileSizeValidator,
   Post,
   Req,
+  Res,
+  UnauthorizedException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -12,24 +14,42 @@ import {
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { JwtAuthGuard } from './guard/jwt-auth.guard';
+import { extractTokenFromCookie, JwtAuthGuard } from './guard/jwt-auth.guard';
 import { RolesGuard } from './guard/role.guard';
 import { Roles } from 'src/decorators/role.decorator';
 import { UserRole } from '@constants/userRole.enum';
 import { ApiAuthUser } from 'src/decorators/api-auth-user.decorator';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes } from '@nestjs/swagger';
 import { Express } from 'express';
 import { OptionalParseFilePipe } from 'src/decorators/OptionalParseFilePipe';
+import { getCookieOptions } from 'src/utils/get-cookie-options';
+import { CookieKey } from '@constants/auth.enum';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/login')
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.login(loginDto);
+
+    res.cookie(
+      CookieKey.ACCESS_TOKEN,
+      result.accessToken,
+      getCookieOptions(result.accessToken),
+    );
+
+    res.cookie(
+      CookieKey.REFRESH_TOKEN,
+      result.refreshToken,
+      getCookieOptions(result.refreshToken),
+    );
+    return result;
   }
 
   @Post('/register')
@@ -50,17 +70,49 @@ export class AuthController {
     return this.authService.register({ ...registerDto, avatar });
   }
 
+  @Post('/refresh-token')
+  async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const accessToken = extractTokenFromCookie(req);
+    const refreshToken = extractTokenFromCookie(req, {
+      type: CookieKey.REFRESH_TOKEN,
+    });
+
+    if (!refreshToken || !accessToken) {
+      throw new UnauthorizedException('Missing token');
+    }
+
+    const result = await this.authService.refreshAccessToken({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    res.cookie(
+      CookieKey.ACCESS_TOKEN,
+      result.access_token,
+      getCookieOptions(result.access_token),
+    );
+
+    res.cookie(
+      CookieKey.REFRESH_TOKEN,
+      result.refresh_token,
+      getCookieOptions(result.refresh_token),
+    );
+
+    return result;
+  }
+
   @Post('/logout')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.User)
   @ApiAuthUser()
-  async logout(@Req() req: Request) {
-    const token = req.headers.authorization.split(' ')[1];
-
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const token = extractTokenFromCookie(req);
+    res.clearCookie(CookieKey.ACCESS_TOKEN);
     await this.authService.logout(token);
-    return {
-      message: 'logout successfully',
-      timestamp: new Date().toISOString(),
-    };
+
+    return { oke: true };
   }
 }

@@ -42,7 +42,7 @@ export class PostsService {
       {
         limit: limit,
         offset: (page - 1) * limit,
-        orderBy: { createdAt: 'DESC' },
+        orderBy: { created_at: 'DESC' },
         populate: ['user', 'image'],
       },
     );
@@ -80,7 +80,6 @@ export class PostsService {
       ...data,
       stored_image_id: storedImage?.id,
       user_id: userId,
-      user: this.request.user,
       image: storedImage,
     });
     await this.em.persistAndFlush(post);
@@ -100,7 +99,7 @@ export class PostsService {
         user_id: userId,
       },
       {
-        fields: ['user_id', 'post_id', 'createdAt', 'updatedAt'],
+        fields: ['user_id', 'post_id', 'created_at', 'updated_at'],
       },
     );
 
@@ -121,7 +120,7 @@ export class PostsService {
       await this.em.commit();
     } catch (error) {
       await this.em.rollback();
-      throw new NotFoundException('Post react roll back');
+      throw new NotFoundException('Post react roll back', error);
     }
     //{ persist: false }: Đảm bảo user và post không tự động lưu hoặc populate trừ khi bạn yêu cầu.
     //@ManyToOne(() => Post, { persist: false })

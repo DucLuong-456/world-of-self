@@ -6,7 +6,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 
-const FeedPost = ({ author, content, time, likes, comments }: any) => (
+const FeedPost = ({
+  author,
+  content,
+  time,
+  likes,
+  comments,
+}: {
+  author: string;
+  content: string;
+  time: string;
+  likes: number;
+  comments: number;
+}) => (
   <Card className="mb-4 hover:shadow-md transition-shadow">
     <CardContent className="p-4">
       <div className="flex items-center space-x-3 mb-4">

@@ -22,6 +22,9 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useLoginMutation } from "@/hooks/user/useLoginMutation";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const LoginSchema = z.object({
   email: z
@@ -40,6 +43,7 @@ const LoginSchema = z.object({
 type LoginFormData = z.infer<typeof LoginSchema>;
 
 export default function LoginPage() {
+  const route = useRouter();
   const form = useForm<LoginFormData>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -48,21 +52,22 @@ export default function LoginPage() {
     },
   });
 
+  const { mutateAsync, isPending } = useLoginMutation();
+
   const onSubmit = async (data: LoginFormData) => {
-    // ⚠️ Ở đây bạn sẽ gọi API để xử lý Đăng nhập
-    console.log("Dữ liệu form đã xác thực:", data);
-
-    // Giả lập trạng thái loading/call API
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Sau khi đăng nhập thành công, có thể chuyển hướng
-    // router.push('/home');
+    try {
+      await mutateAsync(data);
+      route.push("/");
+    } catch {
+      toast.error("Thông tin đăng nhập không chính xác. Vui lòng thử lại.");
+    }
   };
 
-  const isSubmitting = form.formState.isSubmitting;
   const handleSocialLogin = (data: "google" | "github") => {
     return data;
   };
+
+  const isLoading = form.formState.isSubmitting || isPending;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
@@ -118,7 +123,7 @@ export default function LoginPage() {
                         placeholder="ten@example.com"
                         type="email"
                         {...field}
-                        disabled={isSubmitting}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -138,7 +143,7 @@ export default function LoginPage() {
                         placeholder="••••••"
                         type="password"
                         {...field}
-                        disabled={isSubmitting}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -163,10 +168,8 @@ export default function LoginPage() {
               </div>
 
               {/* Nút Đăng nhập */}
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Đăng nhập
               </Button>
             </form>
