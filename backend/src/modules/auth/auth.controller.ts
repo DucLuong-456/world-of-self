@@ -26,6 +26,7 @@ import { Express } from 'express';
 import { OptionalParseFilePipe } from 'src/decorators/OptionalParseFilePipe';
 import { getCookieOptions } from 'src/utils/get-cookie-options';
 import { CookieKey } from '@constants/auth.enum';
+import { GoogleAuthDto } from './dto/google-auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -114,5 +115,27 @@ export class AuthController {
     await this.authService.logout(token);
 
     return { oke: true };
+  }
+
+  @Post('/google')
+  async googleAuth(
+    @Body() body: GoogleAuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.googleAuth(body);
+
+    res.cookie(
+      CookieKey.ACCESS_TOKEN,
+      result.accessToken,
+      getCookieOptions(result.accessToken),
+    );
+
+    res.cookie(
+      CookieKey.REFRESH_TOKEN,
+      result.refreshToken,
+      getCookieOptions(result.refreshToken),
+    );
+
+    return result;
   }
 }

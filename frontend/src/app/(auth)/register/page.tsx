@@ -26,6 +26,7 @@ import * as z from "zod";
 import { useRegisterMutation } from "@/hooks/user/useRegisterMutation";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useGoogleLogin } from '@react-oauth/google';
 
 export const RegisterSchema = z
   .object({
@@ -81,11 +82,33 @@ export default function RegisterPage() {
     }
   };
 
-  // Hàm xử lý Đăng ký bằng Social (Duy trì tính nhất quán giao diện)
-  const handleSocialLogin = (provider: "google" | "github") => {
-    console.log(`Bắt đầu đăng ký bằng ${provider}...`);
-    // Ở đây bạn sẽ gọi API để bắt đầu luồng OAuth2
-  };
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (codeResponse) => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({ access_token: codeResponse.access_token }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Google registration failed');
+        }
+
+        toast.success("Đăng ký thành công!");
+        route.push("/");
+      } catch (error) {
+        toast.error("Đăng ký Google không thành công. Vui lòng thử lại.");
+        console.error('Google registration error:', error);
+      }
+    },
+    onError: () => {
+      toast.error("Đăng ký Google không thành công.");
+    },
+  });
 
   const isSubmitting = form.formState.isSubmitting || isPending;
 
@@ -104,7 +127,8 @@ export default function RegisterPage() {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => handleSocialLogin("google")}
+              onClick={() => googleLogin()}
+              disabled={isSubmitting}
             >
               <Chrome className="mr-2 h-4 w-4" />
               Google
@@ -112,7 +136,7 @@ export default function RegisterPage() {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => handleSocialLogin("github")}
+              disabled={isSubmitting}
             >
               <Github className="mr-2 h-4 w-4" />
               GitHub
