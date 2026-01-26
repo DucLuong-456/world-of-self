@@ -33,7 +33,9 @@ const Header = () => {
   return (
     <header className="w-full bg-white dark:bg-gray-800 shadow-sm p-4 sticky top-0 z-50 border-b">
       <div className="w-full px-10 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-blue-600">My Social App</h1>
+        <h1 className="text-4xl font-black tracking-tighter bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent drop-shadow-sm">
+          Zinze
+        </h1>
 
         <div className="flex items-center gap-4">
           <DropdownMenu>

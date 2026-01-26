@@ -20,6 +20,8 @@ import { RegisterDto } from './dto/register.dto';
 import { getBlacklistTokenKey } from 'src/utils/auth.utils';
 import * as jwt from 'jsonwebtoken';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import axios from 'axios';
+import { GoogleAuthDto } from './dto/google-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -186,5 +188,44 @@ export class AuthService {
       refresh_token: newRefreshToken,
       user: undefined,
     };
+  }
+
+  async googleAuth(body: GoogleAuthDto) {
+    try {
+      // Verify token with Google API
+      const response = await axios.get(
+        `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${body.access_token}`,
+      );
+
+      const googleUser = response.data;
+
+      // Check if user exists
+      let user = await this.userService.findByEmail(googleUser.email);
+
+      if (!user) {
+        // Create new user if doesn't exist
+        const newUser = this.userRepository.create({
+          user_name: googleUser.name || googleUser.email.split('@')[0],
+          email: googleUser.email,
+          avatar: googleUser.picture,
+          password: await bcrypt.hash(Math.random().toString(), 10), // Random password for OAuth users
+        });
+        await this.em.persistAndFlush(newUser);
+        user = newUser;
+      }
+
+      // Generate tokens
+      const { accessToken, refreshToken } = await this.generateTokens(user.id);
+
+      return {
+        accessToken,
+        refreshToken,
+      };
+    } catch {
+      throw new HttpException(
+        'Invalid Google access token',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
