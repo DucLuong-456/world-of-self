@@ -12,6 +12,7 @@ import { QueueName } from './queue/queueName.enum';
 import { PostsModule } from './modules/posts/posts.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { VideosModule } from './modules/videos/videos.module';
+import { MinioModule } from '@modules/minio/minio.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { VideosModule } from './modules/videos/videos.module';
     UsersModule,
     PostsModule,
     VideosModule,
+    MinioModule,
   ],
   controllers: [AppController],
   providers: [AppService],

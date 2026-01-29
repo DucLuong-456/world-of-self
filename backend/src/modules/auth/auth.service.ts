@@ -22,6 +22,7 @@ import * as jwt from 'jsonwebtoken';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import axios from 'axios';
 import { GoogleAuthDto } from './dto/google-auth.dto';
+import { UserProfile } from '@entities/UserProfile';
 
 @Injectable()
 export class AuthService {
@@ -31,6 +32,8 @@ export class AuthService {
     private readonly em: EntityManager,
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
+    @InjectRepository(UserProfile)
+    private readonly userProfileRepository: EntityRepository<UserProfile>,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
@@ -105,7 +108,13 @@ export class AuthService {
       password: hashPassword,
       avatar,
     });
+
+    const userProfile = this.userProfileRepository.create({
+      user_id: newUser.id,
+    });
+
     await this.em.persistAndFlush(newUser);
+    await this.em.persistAndFlush(userProfile);
 
     return newUser;
   }
@@ -211,6 +220,12 @@ export class AuthService {
           password: await bcrypt.hash(Math.random().toString(), 10), // Random password for OAuth users
         });
         await this.em.persistAndFlush(newUser);
+
+        const userProfile = this.userProfileRepository.create({
+          user_id: newUser.id,
+        });
+        await this.em.persistAndFlush(userProfile);
+
         user = newUser;
       }
 

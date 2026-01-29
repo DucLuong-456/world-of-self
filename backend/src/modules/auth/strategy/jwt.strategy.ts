@@ -34,7 +34,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const user = await this.userRepository.findOneOrFail(
       { id: payload.id },
       {
-        fields: ['id', 'email', 'user_name', 'phone', 'role'],
+        fields: [
+          'id',
+          'email',
+          'user_name',
+          'phone',
+          'role',
+          'avatar',
+          'created_at',
+          'profile.*',
+        ],
+        populate: ['profile'],
         failHandler: () => {
           throw new UnauthorizedException('User not found!');
         },

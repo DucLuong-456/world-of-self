@@ -8,10 +8,11 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { User } from '@entities/User';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
+import { UserProfile } from '@entities/UserProfile';
 
 @Module({
   imports: [
-    MikroOrmModule.forFeature([User]),
+    MikroOrmModule.forFeature([User, UserProfile]),
     UserModule,
     PassportModule,
     JwtModule.register({
