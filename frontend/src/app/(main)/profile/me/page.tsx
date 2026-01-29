@@ -1,18 +1,23 @@
-// app/profile/me/page.tsx
+"use client";
 import { Bell, Calendar, Camera, Link2, MapPin, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
+import { formatDate } from "@/utils";
 
 const FeedPost = ({
+  avatar,
   author,
   content,
   time,
   likes,
   comments,
 }: {
+  avatar: string;
   author: string;
   content: string;
   time: string;
@@ -23,7 +28,7 @@ const FeedPost = ({
     <CardContent className="p-4">
       <div className="flex items-center space-x-3 mb-4">
         <Avatar className="h-10 w-10">
-          <AvatarImage src="/avatar-placeholder.jpg" />
+          <AvatarImage src={avatar} />
           <AvatarFallback>JD</AvatarFallback>
         </Avatar>
         <div>
@@ -47,22 +52,27 @@ const FeedPost = ({
 );
 
 export default function ProfilePage() {
+  const { user: userAuth } = useAuthStore();
+  const router = useRouter();
+
   const user = {
-    name: "Jane Doe",
-    username: "janedoe",
-    bio: "Full-stack developer | Yêu thích Next.js, Tailwind & cà phê ☕ | Đang xây dựng những thứ đẹp đẽ trên internet",
-    location: "Hà Nội, Việt Nam",
-    website: "https://janedoe.dev",
-    joinedDate: "Tháng 3 năm 2023",
-    following: 342,
-    followers: 1208,
-    coverImage: "/cover-placeholder.jpg", // bạn có thể thay bằng ảnh thực
-    avatar: "/avatar-placeholder.jpg",
+    name: userAuth?.user_name || "Guest User",
+    username: userAuth?.user_name || "guest",
+    bio: userAuth?.profile?.bio || "Chưa có tiểu sử",
+    location: userAuth?.profile?.location || "",
+    website: userAuth?.profile?.website || "",
+    joinedDate: userAuth?.created_at
+      ? formatDate(userAuth.created_at)
+      : "Đang cập nhật...",
+    following: 0,
+    followers: 0,
+    coverImage: userAuth?.profile?.cover_avatar || "/cover-placeholder.jpg",
+    avatar: userAuth?.avatar || "/avatar-placeholder.jpg",
   };
 
   const posts = [
     {
-      author: "Jane Doe",
+      author: user.name,
       content:
         "Vừa hoàn thành dự án mới với Next.js 14 + App Router + Server Components. Cảm giác thật tuyệt khi mọi thứ mượt mà hơn bao giờ hết!",
       time: "2 giờ trước",
@@ -70,7 +80,7 @@ export default function ProfilePage() {
       comments: 8,
     },
     {
-      author: "Jane Doe",
+      author: user.name,
       content:
         "Ai dùng Shadcn/ui chưa? Mình thấy đây là bộ UI đẹp và dễ tùy biến nhất từ trước đến nay cho Tailwind CSS.",
       time: "1 ngày trước",
@@ -78,7 +88,7 @@ export default function ProfilePage() {
       comments: 15,
     },
     {
-      author: "Jane Doe",
+      author: user.name,
       content: "Cuối tuần đi cà phê và code tiếp nào các bạn ơi",
       time: "3 ngày trước",
       likes: 156,
@@ -90,7 +100,14 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto">
         {/* Cover Photo */}
-        <div className="relative h-64 md:h-96 bg-gradient-to-r from-blue-500 to-purple-600 rounded-b-xl overflow-hidden">
+        <div
+          className="relative h-64 md:h-96 bg-gradient-to-r from-blue-500 to-purple-600 rounded-b-xl overflow-hidden bg-cover bg-center"
+          style={
+            userAuth?.profile?.cover_avatar
+              ? { backgroundImage: `url(${userAuth.profile.cover_avatar})` }
+              : {}
+          }
+        >
           <div className="absolute inset-0 bg-black/20" />
           <Button
             size="icon"
@@ -107,7 +124,9 @@ export default function ProfilePage() {
             <div className="flex items-end space-x-6">
               <Avatar className="h-32 w-32 md:h-40 md:w-40 ring-4 ring-white dark:ring-gray-900">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="text-4xl">JD</AvatarFallback>
+                <AvatarFallback className="text-4xl">
+                  {user.name.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
 
               <div className="mb-4 md:mb-0">
@@ -119,7 +138,11 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex space-x-3 mt-4 md:mt-0">
-              <Button>
+              <Button
+                onClick={() => {
+                  router.push("/profile/edit");
+                }}
+              >
                 <Settings className="mr-2 h-4 w-4" />
                 Chỉnh sửa hồ sơ
               </Button>
@@ -185,7 +208,7 @@ export default function ProfilePage() {
 
           <TabsContent value="posts" className="mt-6">
             {posts.map((post, i) => (
-              <FeedPost key={i} {...post} />
+              <FeedPost key={i} {...post} avatar={user.avatar} />
             ))}
           </TabsContent>
 
