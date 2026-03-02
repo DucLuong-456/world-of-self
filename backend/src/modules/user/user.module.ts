@@ -16,4 +16,4 @@ import { Module } from '@nestjs/common';
   providers: [UserService],
   exports: [UserService],
 })
-export class UserModule { }
+export class UserModule {}

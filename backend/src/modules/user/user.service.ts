@@ -1,6 +1,4 @@
 import { User } from '@entities/User';
-import { UserProfile } from '@entities/UserProfile';
-import { UserRelationship } from '@entities/UserRelationship';
 import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager } from '@mikro-orm/postgresql';
@@ -18,10 +16,6 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
-    @InjectRepository(UserRelationship)
-    private readonly userRelationshipRepository: EntityRepository<UserRelationship>,
-    @InjectRepository(UserProfile)
-    private readonly userProfileRepository: EntityRepository<UserProfile>,
     private em: EntityManager,
     @Inject(REQUEST) protected request: Request,
     private readonly minioService: MinioService,

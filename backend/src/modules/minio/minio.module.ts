@@ -23,4 +23,4 @@ import { S3_CLIENT } from './minio.config';
   ],
   exports: [S3_CLIENT, MinioService],
 })
-export class MinioModule { }
+export class MinioModule {}

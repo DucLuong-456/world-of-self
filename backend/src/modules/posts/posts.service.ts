@@ -9,6 +9,10 @@ import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { CreatePostDto } from './dto/create-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
+import { v4 as uuidv4 } from 'uuid';
+import { BUCKET_NAME } from '@modules/minio/minio.config';
+import { MinioService } from '@modules/minio/minio.service';
+import { PaginatedPosts } from '@dtos/pagination.dto';
 
 @Injectable()
 export class PostsService {
@@ -21,14 +25,12 @@ export class PostsService {
     private readonly postReactRepository: EntityRepository<PostReact>,
     private em: EntityManager,
     @Inject(REQUEST) protected request: Request,
+    private readonly minioService: MinioService,
   ) {}
 
-  async getPosts(data: SearchPostDto) {
+  async getPosts(data: SearchPostDto): Promise<PaginatedPosts> {
     const limit = data?.limit || 5;
     const page = data?.page || 1;
-
-    // get my posts
-    // const userId = (this.request.user as User)?.id;
 
     const whereCondition = {};
     if (data.keyword) {
@@ -43,12 +45,30 @@ export class PostsService {
         limit: limit,
         offset: (page - 1) * limit,
         orderBy: { created_at: 'DESC' },
-        populate: ['user', 'image'],
+        populate: ['user.user_name', 'user.avatar', 'image'],
       },
     );
 
+    const postsWithUrls = await Promise.all(
+      posts.map(async (post) => {
+        if (post.image?.path) {
+          post.image.path = await this.minioService.getFileUrl(
+            BUCKET_NAME,
+            post.image.path,
+          );
+        }
+        if (post.user?.avatar) {
+          post.user.avatar = await this.minioService.getFileUrl(
+            BUCKET_NAME,
+            post.user.avatar,
+          );
+        }
+        return post;
+      }),
+    );
+
     return {
-      posts,
+      posts: postsWithUrls,
       paging: {
         limit: limit,
         page: page,
@@ -67,22 +87,42 @@ export class PostsService {
   async create(data: CreatePostDto) {
     const userId = (this.request.user as User)?.id;
 
-    let storedImage: StoredImage;
-    if (data.image_metadata) {
-      storedImage = this.em.create(StoredImage, {
-        path: data.image_metadata.path,
-        ext: data.image_metadata.ext,
-      });
-      await this.em.persistAndFlush(storedImage);
-    }
+    let post: Post;
+    await this.em.begin();
+    try {
+      let storedImage: StoredImage;
 
-    const post = this.postRepository.create({
-      ...data,
-      stored_image_id: storedImage?.id,
-      user_id: userId,
-      image: storedImage,
-    });
-    await this.em.persistAndFlush(post);
+      if (data.thumbnail) {
+        const extension = data.thumbnail.originalname.split('.').pop();
+        const fileName = `posts/${uuidv4()}.${extension}`;
+        await this.minioService.uploadFile(
+          BUCKET_NAME,
+          fileName,
+          data.thumbnail.buffer,
+          data.thumbnail.mimetype,
+        );
+
+        storedImage = this.em.create(StoredImage, {
+          path: fileName,
+          ext: extension,
+        });
+        await this.em.persistAndFlush(storedImage);
+      }
+
+      post = this.postRepository.create({
+        ...(data?.title && { title: data.title }),
+        content: data.content,
+        ...(data?.category && { category: data.category }),
+        user_id: userId,
+        stored_image_id: storedImage.id,
+      });
+
+      await this.em.persistAndFlush(post);
+      await this.em.commit();
+    } catch (error) {
+      await this.em.rollback();
+      throw error;
+    }
 
     return post;
   }

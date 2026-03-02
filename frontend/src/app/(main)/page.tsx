@@ -16,6 +16,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuthStore } from "@/store/authStore";
+import { useGetPosts } from "@/hooks/post/useGetPosts";
+import { useCreatePostMutation } from "@/hooks/post/useCreatePostMutation";
+import { Post } from "@/types/post";
 
 const FeedPost = ({
   author,
@@ -82,6 +85,16 @@ const FeedPost = ({
   </Card>
 );
 
+const formatTime = (dateStr: string) => {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "Vừa xong";
+  if (minutes < 60) return `${minutes} phút trước`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} giờ trước`;
+  return `${Math.floor(hours / 24)} ngày trước`;
+};
+
 export default function HomePage() {
   const { user } = useAuthStore();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -89,9 +102,15 @@ export default function HomePage() {
   const [content, setContent] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: postsData, isLoading: isLoadingPosts } = useGetPosts({
+    page: 1,
+    limit: 10,
+  });
+
+  const { mutate: createPost, isPending: isCreating } = useCreatePostMutation();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -119,36 +138,19 @@ export default function HomePage() {
     setIsExpanded(false);
   };
 
-  const handlePost = async () => {
+  const handlePost = () => {
     if (!content.trim() && !imageFile) return;
-    setLoading(true);
-    // Giả lập API gọi thành công
-    setTimeout(() => {
-      setLoading(false);
-      resetForm();
-    }, 1500);
+    createPost(
+      {
+        title: title || undefined,
+        content,
+        thumbnail: imageFile || undefined,
+      },
+      { onSuccess: resetForm },
+    );
   };
 
-  const mockPosts = [
-    {
-      author: "Admin",
-      authorAvatar: "/avatar-placeholder.jpg",
-      title: "Chào mừng bạn đến với World of Self!",
-      content:
-        "Chào mừng đến với mạng xã hội mới được xây dựng bằng Next.js và Shadcn/ui! Hãy chia sẻ những khoảnh khắc tuyệt vời của bạn tại đây.",
-      time: "1 giờ trước",
-      likes: 15,
-      comments: 3,
-    },
-    {
-      author: "User A",
-      content:
-        "Tailwind CSS làm cho việc tạo kiểu giao diện thật dễ dàng và nhanh chóng! Minh chứng là giao diện trang chủ này được hoàn thiện chỉ trong vài phút.",
-      time: "30 phút trước",
-      likes: 8,
-      comments: 1,
-    },
-  ];
+  const posts: Post[] = postsData?.posts ?? [];
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -260,11 +262,11 @@ export default function HomePage() {
                   </Button>
                   <Button
                     size="sm"
-                    disabled={loading || (!content.trim() && !imageFile)}
+                    disabled={isCreating || (!content.trim() && !imageFile)}
                     onClick={handlePost}
                     className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
                   >
-                    {loading ? (
+                    {isCreating ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <>
@@ -282,13 +284,35 @@ export default function HomePage() {
 
       {/* Feed */}
       <div className="space-y-4">
-        {mockPosts.map((post, index) => (
-          <FeedPost key={index} {...post} />
-        ))}
-      </div>
+        {isLoadingPosts ? (
+          <div className="flex justify-center py-10">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="text-center text-gray-400 py-10 text-sm">
+            Chưa có bài viết nào. Hãy là người đầu tiên chia sẻ!
+          </div>
+        ) : (
+          posts.map((post) => (
+            <FeedPost
+              key={post.id}
+              author={post.user?.user_name ?? "Ẩn danh"}
+              authorAvatar={post.user?.avatar}
+              title={post.title}
+              content={post.content}
+              image={post.image?.path}
+              time={formatTime(post.created_at)}
+              likes={post.react_count}
+              comments={0}
+            />
+          ))
+        )}
 
-      <div className="text-center text-gray-400 py-10 text-sm">
-        Bạn đã xem hết các bài viết mới nhất.
+        {!isLoadingPosts && posts.length > 0 && (
+          <div className="text-center text-gray-400 py-10 text-sm">
+            Bạn đã xem hết các bài viết mới nhất.
+          </div>
+        )}
       </div>
     </div>
   );
