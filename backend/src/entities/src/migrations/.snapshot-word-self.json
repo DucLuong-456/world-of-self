@@ -260,6 +260,17 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
+          "nullable": true,
+          "length": 255,
+          "default": "null",
+          "mappedType": "string"
+        },
+        "content": {
+          "name": "content",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
           "nullable": false,
           "length": 255,
           "mappedType": "string"
@@ -276,13 +287,12 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "varchar(255)",
+          "type": "uuid",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 255,
-          "mappedType": "string"
+          "mappedType": "uuid"
         },
         "category": {
           "name": "category",
@@ -302,15 +312,6 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "uuid"
-        },
-        "activity_id": {
-          "name": "activity_id",
-          "type": "uuid",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
           "mappedType": "uuid"
         }
       },
@@ -340,10 +341,10 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "posts_activity_id_foreign": {
-          "constraintName": "posts_activity_id_foreign",
+        "posts_user_id_foreign": {
+          "constraintName": "posts_user_id_foreign",
           "columnNames": [
-            "activity_id"
+            "user_id"
           ],
           "localTableName": "public.posts",
           "referencedColumnNames": [

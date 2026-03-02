@@ -14,8 +14,11 @@ import { PostReact } from './PostReact';
 
 @Entity({ tableName: 'posts' })
 export class Post extends CustomBaseEntityWithDeletedAt {
-  @Property()
+  @Property({ nullable: true, default: null })
   title: string;
+
+  @Property()
+  content: string;
 
   @Property({ type: 'int', default: 0 })
   react_count: number;
@@ -33,7 +36,7 @@ export class Post extends CustomBaseEntityWithDeletedAt {
     entity: () => User,
     nullable: true,
     inversedBy: (user) => user.posts,
-    joinColumn: 'activity_id',
+    joinColumn: 'user_id',
   })
   user!: User;
 

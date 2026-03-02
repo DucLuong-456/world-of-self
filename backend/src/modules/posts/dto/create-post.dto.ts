@@ -1,21 +1,29 @@
 import { PostCategory } from '@constants/postCategory';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { StoredImageDto } from './store-image.dto';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  title?: string;
+
   @ApiProperty()
   @IsString()
-  title: string;
+  @IsNotEmpty()
+  content: string;
 
-  @ApiProperty({ enum: PostCategory })
+  @ApiProperty({ enum: PostCategory, required: false })
   @IsEnum(PostCategory)
-  category: PostCategory;
-
-  @ApiProperty({ required: false })
   @IsOptional()
-  @ValidateNested()
-  @Type(() => StoredImageDto)
-  image_metadata?: StoredImageDto;
+  category?: PostCategory;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    nullable: true,
+    required: false,
+  })
+  @IsOptional()
+  thumbnail?: Express.Multer.File | null;
 }
