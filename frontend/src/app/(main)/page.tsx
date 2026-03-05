@@ -18,7 +18,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuthStore } from "@/store/authStore";
 import { useGetPosts } from "@/hooks/post/useGetPosts";
 import { useCreatePostMutation } from "@/hooks/post/useCreatePostMutation";
+import { useToggleReactMutation } from "@/hooks/post/useToggleReactMutation";
 import { Post } from "@/types/post";
+import { cn } from "@/lib/utils";
 
 const FeedPost = ({
   author,
@@ -29,6 +31,8 @@ const FeedPost = ({
   time,
   likes,
   comments,
+  isReacted,
+  onReact,
 }: {
   author: string;
   authorAvatar?: string;
@@ -38,6 +42,8 @@ const FeedPost = ({
   time: string;
   likes: number;
   comments: number;
+  isReacted?: boolean;
+  onReact?: () => void;
 }) => (
   <Card className="mb-4 overflow-hidden border-none shadow-sm hover:shadow-md transition-shadow">
     <CardHeader className="flex flex-row items-center space-x-3 p-4">
@@ -67,9 +73,15 @@ const FeedPost = ({
         <Button
           variant="ghost"
           size="sm"
-          className="flex items-center space-x-2 text-gray-500 hover:text-red-500 hover:bg-red-50"
+          onClick={onReact}
+          className={cn(
+            "flex items-center space-x-2 transition-all duration-200",
+            isReacted
+              ? "text-red-500 bg-red-50 hover:bg-red-100"
+              : "text-gray-500 hover:text-red-500 hover:bg-red-50",
+          )}
         >
-          <Heart className="h-4 w-4" />
+          <Heart className={cn("h-4 w-4", isReacted && "fill-current")} />
           <span className="font-medium">{likes}</span>
         </Button>
         <Button
@@ -111,6 +123,7 @@ export default function HomePage() {
   });
 
   const { mutate: createPost, isPending: isCreating } = useCreatePostMutation();
+  const { mutate: toggleReact } = useToggleReactMutation();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -304,6 +317,8 @@ export default function HomePage() {
               time={formatTime(post.created_at)}
               likes={post.react_count}
               comments={0}
+              isReacted={post.is_reacted}
+              onReact={() => toggleReact(post.id)}
             />
           ))
         )}
