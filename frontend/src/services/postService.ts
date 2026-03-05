@@ -26,3 +26,8 @@ export const createPost = async (payload: CreatePostPayload): Promise<Post> => {
   });
   return data;
 };
+
+export const toggleReact = async (postId: string) => {
+  const { data } = await apiClient.patch(`/posts/${postId}/react`);
+  return data;
+};

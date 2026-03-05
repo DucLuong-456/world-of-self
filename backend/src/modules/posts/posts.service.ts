@@ -49,8 +49,19 @@ export class PostsService {
       },
     );
 
+    const userId = (this.request.user as User)?.id;
+    let reactedPostIds = new Set<string>();
+    if (userId) {
+      const reactions = await this.postReactRepository.find({
+        user_id: userId,
+        post_id: { $in: posts.map((p) => p.id) },
+      });
+      reactedPostIds = new Set(reactions.map((r) => r.post_id));
+    }
+
     const postsWithUrls = await Promise.all(
       posts.map(async (post) => {
+        post.is_reacted = reactedPostIds.has(post.id);
         if (post.image?.path) {
           post.image.path = await this.minioService.getFileUrl(
             BUCKET_NAME,
@@ -78,10 +89,35 @@ export class PostsService {
   }
 
   async getPost(postId: string) {
-    return this.postRepository.findOne(
+    const userId = (this.request.user as User)?.id;
+    const post = await this.postRepository.findOne(
       { id: postId },
       { populate: ['user', 'image'] },
     );
+
+    if (post && userId) {
+      const reaction = await this.postReactRepository.findOne({
+        user_id: userId,
+        post_id: postId,
+      });
+      post.is_reacted = !!reaction;
+    }
+
+    if (post?.image?.path) {
+      post.image.path = await this.minioService.getFileUrl(
+        BUCKET_NAME,
+        post.image.path,
+      );
+    }
+
+    if (post?.user?.avatar) {
+      post.user.avatar = await this.minioService.getFileUrl(
+        BUCKET_NAME,
+        post.user.avatar,
+      );
+    }
+
+    return post;
   }
 
   async create(data: CreatePostDto) {

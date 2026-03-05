@@ -22,6 +22,7 @@ export interface Post {
   stored_image_id?: string;
   image?: StoredImage;
   user?: User;
+  is_reacted?: boolean;
   created_at: string;
   updated_at: string;
 }

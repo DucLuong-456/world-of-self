@@ -17,6 +17,9 @@ export class Post extends CustomBaseEntityWithDeletedAt {
   @Property({ nullable: true, default: null })
   title: string;
 
+  @Property({ persist: false })
+  is_reacted?: boolean = false;
+
   @Property()
   content: string;
 
