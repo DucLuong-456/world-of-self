@@ -26,7 +26,7 @@ export class PostsService {
     private em: EntityManager,
     @Inject(REQUEST) protected request: Request,
     private readonly minioService: MinioService,
-  ) {}
+  ) { }
 
   async getPosts(data: SearchPostDto): Promise<PaginatedPosts> {
     const limit = data?.limit || 5;
@@ -198,9 +198,7 @@ export class PostsService {
       await this.em.rollback();
       throw new NotFoundException('Post react roll back', error);
     }
-    //{ persist: false }: Đảm bảo user và post không tự động lưu hoặc populate trừ khi bạn yêu cầu.
-    //@ManyToOne(() => Post, { persist: false })
-    // post!: Post;
+
     return postReact;
   }
 }

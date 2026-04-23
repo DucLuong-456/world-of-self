@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   if (isLoading || !isFetched) {
     return (
       <div className="h-screen w-screen flex items-center justify-center">
-        Loading...
+        <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-white"></div>
       </div>
     );
   }
