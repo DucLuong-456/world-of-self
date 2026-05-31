@@ -1,9 +1,9 @@
 import { defineConfig } from '@mikro-orm/postgresql';
 import * as dotenv from 'dotenv';
-import { Migrator, TSMigrationGenerator } from '@mikro-orm/migrations';
+import { Migrator } from '@mikro-orm/migrations';
 import { SeedManager } from '@mikro-orm/seeder';
 import { User } from '@entities/User';
-import { Post } from '@nestjs/common';
+import { Post } from '@entities/Post';
 import { PostReact } from '@entities/PostReact';
 import { StoredImage } from '@entities/StoredImage';
 import { UserRelationship } from '@entities/UserRelationship';
@@ -35,9 +35,8 @@ export default defineConfig({
     allOrNothing: true,
     dropTables: true,
     safe: false,
-    snapshot: true,
+    snapshot: false,
     emit: 'ts',
-    generator: TSMigrationGenerator,
   },
   seeder: {
     path: './dist/entities/src/seeders', // path to the folder with seeders
