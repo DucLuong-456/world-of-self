@@ -1,55 +1,11 @@
 "use client";
-import { Bell, Calendar, Camera, Link2, MapPin, Settings } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/store/authStore";
-import { formatDate } from "@/utils";
 
-const FeedPost = ({
-  avatar,
-  author,
-  content,
-  time,
-  likes,
-  comments,
-}: {
-  avatar: string;
-  author: string;
-  content: string;
-  time: string;
-  likes: number;
-  comments: number;
-}) => (
-  <Card className="mb-4 hover:shadow-md transition-shadow">
-    <CardContent className="p-4">
-      <div className="flex items-center space-x-3 mb-4">
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={avatar} />
-          <AvatarFallback>JD</AvatarFallback>
-        </Avatar>
-        <div>
-          <p className="font-semibold">{author}</p>
-          <p className="text-xs text-gray-500">{time}</p>
-        </div>
-      </div>
-      <p className="mb-4 text-gray-800 dark:text-gray-200">{content}</p>
-      <div className="flex justify-between border-t pt-3 text-sm text-gray-500">
-        <Button variant="ghost" size="sm" className="space-x-1">
-          <span>Thích</span>
-          <span>({likes})</span>
-        </Button>
-        <Button variant="ghost" size="sm" className="space-x-1">
-          <span>Bình luận</span>
-          <span>({comments})</span>
-        </Button>
-      </div>
-    </CardContent>
-  </Card>
-);
+import { Camera, MapPin, Calendar, LinkIcon, Edit, Bell } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const { user: userAuth } = useAuthStore();
@@ -59,184 +15,190 @@ export default function ProfilePage() {
     name: userAuth?.user_name || "Guest User",
     username: userAuth?.user_name || "guest",
     bio: userAuth?.profile?.bio || "Chưa có tiểu sử",
-    location: userAuth?.profile?.location || "",
+    location: userAuth?.profile?.location || "Chưa cập nhật",
     website: userAuth?.profile?.website || "",
     joinedDate: userAuth?.created_at
-      ? formatDate(userAuth.created_at)
+      ? new Date(userAuth.created_at).toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' })
       : "Đang cập nhật...",
     following: 0,
     followers: 0,
-    coverImage: userAuth?.profile?.cover_avatar || "/cover-placeholder.jpg",
-    avatar: userAuth?.avatar || "/avatar-placeholder.jpg",
+    avatar: userAuth?.avatar || "",
+    cover: userAuth?.profile?.cover_avatar || "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=400&fit=crop",
   };
 
-  const posts = [
+  // Mock posts for the grid view like in the dashboard
+  const userPosts = [
     {
-      author: user.name,
-      content:
-        "Vừa hoàn thành dự án mới với Next.js 14 + App Router + Server Components. Cảm giác thật tuyệt khi mọi thứ mượt mà hơn bao giờ hết!",
-      time: "2 giờ trước",
-      likes: 42,
-      comments: 8,
+      id: "1",
+      image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=400&fit=crop",
+      likes: 128,
+      comments: 24,
     },
     {
-      author: user.name,
-      content:
-        "Ai dùng Shadcn/ui chưa? Mình thấy đây là bộ UI đẹp và dễ tùy biến nhất từ trước đến nay cho Tailwind CSS.",
-      time: "1 ngày trước",
-      likes: 89,
-      comments: 15,
+      id: "2",
+      image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=400&h=400&fit=crop",
+      likes: 256,
+      comments: 42,
     },
     {
-      author: user.name,
-      content: "Cuối tuần đi cà phê và code tiếp nào các bạn ơi",
-      time: "3 ngày trước",
-      likes: 156,
-      comments: 23,
+      id: "3",
+      image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&h=400&fit=crop",
+      likes: 412,
+      comments: 67,
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-4xl mx-auto">
-        {/* Cover Photo */}
-        <div
-          className="relative h-64 md:h-96 bg-gradient-to-r from-blue-500 to-purple-600 rounded-b-xl overflow-hidden bg-cover bg-center"
-          style={
-            userAuth?.profile?.cover_avatar
-              ? { backgroundImage: `url(${userAuth.profile.cover_avatar})` }
-              : {}
-          }
-        >
-          <div className="absolute inset-0 bg-black/20" />
+    <div className="space-y-6 pb-12">
+      {/* Cover & Avatar */}
+      <div className="relative">
+        <div className="h-48 w-full rounded-xl bg-gradient-to-r from-primary/30 via-primary/20 to-accent/30 overflow-hidden border border-border">
+          <img
+            src={user.cover}
+            alt="Cover"
+            className="h-full w-full object-cover opacity-50"
+          />
           <Button
-            size="icon"
             variant="secondary"
-            className="absolute bottom-4 right-4"
+            size="sm"
+            className="absolute right-4 top-4 gap-2 shadow-sm"
           >
-            <Camera className="h-5 w-5" />
+            <Camera className="h-4 w-4" />
+            Edit Cover
           </Button>
         </div>
+        <div className="absolute -bottom-16 left-6">
+          <div className="relative">
+            <Avatar className="h-32 w-32 border-4 border-background shadow-xl rounded-full">
+              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarFallback className="text-3xl bg-muted font-bold">
+                {user.name.substring(0, 1).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <button className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md hover:bg-primary/90 transition-colors border-2 border-background">
+              <Camera className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
 
-        {/* Avatar + Info */}
-        <div className="relative px-4 -mt-20 md:-mt-32">
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between">
-            <div className="flex items-end space-x-6">
-              <Avatar className="h-32 w-32 md:h-40 md:w-40 ring-4 ring-white dark:ring-gray-900">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="text-4xl">
-                  {user.name.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="mb-4 md:mb-0">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {user.name}
-                </h1>
-                <p className="text-gray-500">@{user.username}</p>
-              </div>
-            </div>
-
-            <div className="flex space-x-3 mt-4 md:mt-0">
-              <Button
-                onClick={() => {
-                  router.push("/profile/edit");
-                }}
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                Chỉnh sửa hồ sơ
-              </Button>
-              <Button variant="outline">
+      {/* Profile Info */}
+      <div className="pt-12 px-6">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">{user.name}</h1>
+            <p className="text-muted-foreground font-medium small">@{user.username}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={() => router.push("/profile/edit")} className="gap-2 font-bold shadow-sm">
+                <Edit className="h-4 w-4" />
+                Edit Profile
+            </Button>
+            <Button variant="outline" size="icon" className="shadow-sm">
                 <Bell className="h-4 w-4" />
-              </Button>
-            </div>
+            </Button>
           </div>
-
-          {/* Bio & Info */}
-          <div className="mt-6 space-y-3">
-            <p className="text-gray-700 dark:text-gray-300">{user.bio}</p>
-
-            <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
-              {user.location && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  <span>{user.location}</span>
-                </div>
-              )}
-              {user.website && (
-                <div className="flex items-center gap-1">
-                  <Link2 className="h-4 w-4" />
-                  <a
-                    href={user.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    {user.website.replace(/^https?:\/\//, "")}
-                  </a>
-                </div>
-              )}
-              <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
-                <span>Tham gia {user.joinedDate}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-6 py-2">
-              <div className="text-center">
-                <span className="font-bold text-xl">{user.following}</span>
-                <p className="text-gray-500">Đang theo dõi</p>
-              </div>
-              <div className="text-center">
-                <span className="font-bold text-xl">{user.followers}</span>
-                <p className="text-gray-500">Người theo dõi</p>
-              </div>
-            </div>
-          </div>
-
-          <Separator className="my-8" />
         </div>
 
-        {/* Tabs: Bài viết, Bình luận, Thích, Media */}
-        <Tabs defaultValue="posts" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="posts">Bài viết</TabsTrigger>
-            <TabsTrigger value="replies">Trả lời</TabsTrigger>
-            <TabsTrigger value="likes">Thích</TabsTrigger>
-            <TabsTrigger value="media">Media</TabsTrigger>
-          </TabsList>
+        <p className="mt-4 text-sm text-foreground/80 leading-relaxed max-w-2xl">
+          {user.bio}
+        </p>
 
-          <TabsContent value="posts" className="mt-6">
-            {posts.map((post, i) => (
-              <FeedPost key={i} {...post} avatar={user.avatar} />
-            ))}
-          </TabsContent>
+        <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground font-medium">
+          {user.location && (
+            <span className="flex items-center gap-1.5">
+                <MapPin className="h-4 w-4" />
+                {user.location}
+            </span>
+          )}
+          {user.website && (
+            <span className="flex items-center gap-1.5">
+                <LinkIcon className="h-4 w-4" />
+                <a href={user.website} target="_blank" className="text-primary hover:underline transition-colors">
+                {user.website.replace(/^https?:\/\//, "")}
+                </a>
+            </span>
+          )}
+          <span className="flex items-center gap-1.5">
+            <Calendar className="h-4 w-4" />
+            Tham gia {user.joinedDate}
+          </span>
+        </div>
 
-          <TabsContent value="replies" className="mt-6">
-            <Card>
-              <CardContent className="p-8 text-center text-gray-500">
-                Chưa có bình luận nào được hiển thị công khai.
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="likes" className="mt-6">
-            <Card>
-              <CardContent className="p-8 text-center text-gray-500">
-                Các bài viết bạn đã thích sẽ xuất hiện ở đây.
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="media" className="mt-6">
-            <Card>
-              <CardContent className="p-8 text-center text-gray-500">
-                Chưa có media nào được đăng.
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        <div className="mt-6 flex gap-8 text-sm">
+          <button className="hover:underline transition-all group">
+            <span className="font-bold text-lg text-foreground group-hover:text-primary">{user.following}</span>{" "}
+            <span className="text-muted-foreground font-bold uppercase tracking-wider text-[10px]">Đang theo dõi</span>
+          </button>
+          <button className="hover:underline transition-all group">
+            <span className="font-bold text-lg text-foreground group-hover:text-primary">{user.followers}</span>{" "}
+            <span className="text-muted-foreground font-bold uppercase tracking-wider text-[10px]">Người theo dõi</span>
+          </button>
+        </div>
       </div>
+
+      {/* Content Tabs */}
+      <Tabs defaultValue="posts" className="px-6">
+        <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-auto p-0 gap-8 mb-6">
+          <TabsTrigger 
+            value="posts" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 pb-3 font-bold text-sm tracking-wide"
+          >
+            Posts
+          </TabsTrigger>
+          <TabsTrigger 
+            value="photos" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 pb-3 font-bold text-sm tracking-wide"
+          >
+            Photos
+          </TabsTrigger>
+          <TabsTrigger 
+            value="likes" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 pb-3 font-bold text-sm tracking-wide"
+          >
+            Likes
+          </TabsTrigger>
+        </TabsList>
+
+        <div className="min-h-[400px]">
+          <TabsContent value="posts" className="mt-0 animate-in fade-in duration-500">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {userPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="group relative aspect-square overflow-hidden rounded-xl border border-border shadow-sm cursor-pointer"
+                >
+                  <img
+                    src={post.image}
+                    alt="Post"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center gap-6 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 backdrop-blur-[2px]">
+                    <span className="flex items-center gap-2 text-sm font-bold text-white">
+                      ❤️ {post.likes}
+                    </span>
+                    <span className="flex items-center gap-2 text-sm font-bold text-white">
+                      💬 {post.comments}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="photos" className="mt-0 animate-in fade-in duration-500">
+            <div className="rounded-xl border border-border bg-card p-12 text-center shadow-sm">
+              <p className="text-sm font-medium text-muted-foreground">Ảnh của bạn sẽ xuất hiện ở đây.</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="likes" className="mt-0 animate-in fade-in duration-500">
+            <div className="rounded-xl border border-border bg-card p-12 text-center shadow-sm">
+              <p className="text-sm font-medium text-muted-foreground">Các bài viết bạn đã thích sẽ xuất hiện ở đây.</p>
+            </div>
+          </TabsContent>
+        </div>
+      </Tabs>
     </div>
   );
 }

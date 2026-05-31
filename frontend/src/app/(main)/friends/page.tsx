@@ -1,185 +1,168 @@
-// app/friends/page.tsx
+"use client";
+
+import { useState } from "react";
+import { Check, X, UserMinus, MessageCircle, Users, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { MapPin, Search, UserMinus, Users } from "lucide-react";
 
-interface Friend {
-  id: number;
-  name: string;
-  username: string;
-  avatar?: string;
-  bio?: string;
-  location?: string;
-  mutualFriends: number;
-  isFollowing: boolean; // nếu là trang "Người theo dõi" thì đổi thành true/false phù hợp
-}
-
-const mockFriends: Friend[] = [
+const mockFriends = [
   {
-    id: 1,
+    id: "1",
     name: "Nguyễn Văn A",
     username: "nguyenvana",
-    bio: "Front-end Developer | React & Next.js",
-    location: "TP. Hồ Chí Minh",
-    mutualFriends: 28,
-    isFollowing: true,
+    avatar: "",
+    status: "online",
   },
   {
-    id: 2,
+    id: "2",
     name: "Trần Thị B",
     username: "tranthib",
-    bio: "UI/UX Designer | Figma Master",
-    location: "Đà Nẵng",
-    mutualFriends: 15,
-    isFollowing: true,
+    avatar: "",
+    status: "offline",
   },
   {
-    id: 3,
+    id: "3",
     name: "Lê Minh C",
     username: "leminhc",
-    bio: "Full-stack | Node.js | Love coffee",
-    mutualFriends: 42,
-    isFollowing: true,
-  },
-  {
-    id: 4,
-    name: "Phạm Hồng D",
-    username: "phamhongd",
-    bio: "Mobile Dev | Flutter enthusiast",
-    location: "Hà Nội",
-    mutualFriends: 9,
-    isFollowing: true,
-  },
-  {
-    id: 5,
-    name: "Hoàng Yến Nhi",
-    username: "hoangyennhi",
-    bio: "Content Creator | Travel & Food",
-    location: "Hà Nội",
-    mutualFriends: 56,
-    isFollowing: true,
-  },
-  {
-    id: 6,
-    name: "Đỗ Đức E",
-    username: "doduce",
-    bio: "DevOps Engineer | Kubernetes & Docker",
-    mutualFriends: 33,
-    isFollowing: true,
+    avatar: "",
+    status: "online",
   },
 ];
 
+const friendRequests = [
+  {
+    id: "r1",
+    name: "Jessica Lee",
+    username: "jessical",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face",
+    mutualFriends: 12,
+  },
+];
+
+const statusColors = {
+  online: "bg-green-500",
+  offline: "bg-gray-500",
+  away: "bg-yellow-500",
+};
+
 export default function FriendsPage() {
+  const [activeTab, setActiveTab] = useState("all");
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-4xl mx-auto p-4 lg:p-6">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Users className="h-8 w-8 text-blue-600" />
-            Bạn bè
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            {mockFriends.length} người bạn
-          </p>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-foreground">Bạn bè</h2>
+        <div className="relative w-64">
+           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+           <Input placeholder="Tìm kiếm bạn bè..." className="pl-9 h-9 border-none bg-muted/50 focus-visible:ring-1" />
         </div>
-
-        {/* Thanh tìm kiếm */}
-        <div className="relative max-w-md mb-8">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input placeholder="Tìm kiếm bạn bè..." className="pl-10" />
-        </div>
-
-        {/* Tabs (Bạn bè / Đang theo dõi / Người theo dõi) – có thể mở rộng sau */}
-        <div className="flex gap-4 mb-6 border-b">
-          <Button
-            variant="ghost"
-            className="pb-4 px-1 border-b-2 border-blue-600 text-blue-600"
+      </div>
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-auto p-0 gap-6">
+          <TabsTrigger 
+            value="all" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 pb-2 font-bold"
           >
             Tất cả bạn bè
-          </Button>
-          {/* <Button variant="ghost" className="pb-4 px-1">Đang theo dõi</Button>
-          <Button variant="ghost" className="pb-4 px-1">Người theo dõi</Button> */}
-        </div>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="requests" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 pb-2 font-bold relative"
+          >
+            Lời mời
+            {friendRequests.length > 0 && (
+              <span className="ml-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                {friendRequests.length}
+              </span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger 
+            value="following" 
+            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-1 pb-2 font-bold"
+          >
+            Đang theo dõi
+          </TabsTrigger>
+        </TabsList>
 
-        {/* Danh sách bạn bè dạng lưới */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {mockFriends.map((friend) => (
-            <Card key={friend.id} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between">
-                  <div className="flex gap-4">
-                    <Avatar className="h-16 w-16 ring-2 ring-offset-2 ring-gray-200">
-                      <AvatarImage src={friend.avatar} />
-                      <AvatarFallback className="text-lg">
-                        {friend.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <div className="space-y-1">
-                      <h3 className="font-semibold text-lg">{friend.name}</h3>
-                      <p className="text-sm text-gray-500">
-                        @{friend.username}
-                      </p>
-
-                      {friend.bio && (
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 line-clamp-2">
-                          {friend.bio}
-                        </p>
-                      )}
-
-                      <div className="flex flex-wrap gap-3 mt-3 text-xs text-gray-500">
-                        {friend.location && (
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            {friend.location}
-                          </div>
-                        )}
-                        <div className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          {friend.mutualFriends} bạn chung
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Nút hành động */}
-                  <Button
-                    variant={friend.isFollowing ? "outline" : "default"}
-                    size="sm"
-                    className="mt-1"
-                  >
-                    {friend.isFollowing ? (
-                      <>
-                        <UserMinus className="h-4 w-4 mr-1" />
-                        Hủy kết bạn
-                      </>
-                    ) : (
-                      "Theo dõi lại"
-                    )}
+        <TabsContent value="all" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {mockFriends.map((friend) => (
+              <div
+                key={friend.id}
+                className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="relative">
+                  <Avatar className="h-14 w-14 border">
+                    <AvatarImage src={friend.avatar} alt={friend.name} />
+                    <AvatarFallback>{friend.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div
+                    className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-card ${
+                      statusColors[friend.status as keyof typeof statusColors]
+                    }`}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-card-foreground">
+                    {friend.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">@{friend.username}</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                    <MessageCircle className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive">
+                    <UserMinus className="h-4 w-4" />
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        </TabsContent>
 
-        {/* Nếu không có bạn bè nào */}
-        {mockFriends.length === 0 && (
-          <Card className="text-center py-12">
-            <CardContent>
-              <Users className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-500">Bạn chưa có bạn bè nào.</p>
-              <Button className="mt-4">Tìm bạn bè</Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+        <TabsContent value="requests" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {friendRequests.map((request) => (
+              <div
+                key={request.id}
+                className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card shadow-sm"
+              >
+                <Avatar className="h-14 w-14 border">
+                  <AvatarImage src={request.avatar} alt={request.name} />
+                  <AvatarFallback>{request.name[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-card-foreground">
+                    {request.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {request.mutualFriends} bạn chung
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" className="h-8 px-3 text-xs bg-primary hover:bg-primary/90">
+                    Chấp nhận
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
+                    Từ chối
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="following" className="mt-6">
+          <div className="rounded-xl border border-border bg-card p-12 text-center shadow-sm">
+            <Users className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+            <p className="text-sm text-muted-foreground">Danh sách đang theo dõi sẽ xuất hiện ở đây.</p>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
