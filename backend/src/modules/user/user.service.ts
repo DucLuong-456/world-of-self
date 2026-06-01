@@ -47,16 +47,16 @@ export class UserService {
   }
 
   async updateUserProfile(userId: string, data: UpdateUserDto) {
+    const user = await this.userRepository.findOneOrFail(
+      { id: userId },
+      {
+        fields: ['id', 'user_name', 'email', 'phone', 'avatar'],
+        populate: ['profile'],
+      },
+    );
+
     await this.em.begin();
     try {
-      const user = await this.userRepository.findOneOrFail(
-        { id: userId },
-        {
-          fields: ['id', 'user_name', 'email', 'phone', 'avatar'],
-          populate: ['profile'],
-        },
-      );
-
       if (data.user_name) {
         user.user_name = data.user_name;
       }
