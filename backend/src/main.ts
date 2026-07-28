@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { SwaggerAppModule } from '@modules/swagger-app/swagger-app.module';
+import { SwaggerAppModule } from '@modules/swagger/swagger-app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { HttpExceptionFilter } from '@exceptions/http-exception.filter';
 import { TransformInterceptor } from './interceptors/transform.interceptor';

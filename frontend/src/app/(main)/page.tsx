@@ -48,11 +48,14 @@ export default function HomePage() {
               key={post.id}
               author={{
                 name: post.user?.user_name ?? "Ẩn danh",
-                username: post.user?.user_name?.toLowerCase().replace(/\s+/g, ""),
+                username: post.user?.user_name
+                  ?.toLowerCase()
+                  .replace(/\s+/g, ""),
                 avatar: post.user?.avatar,
               }}
               content={post.content}
-              image={post.image?.path}
+              images={post.images ?? []}
+              template={post.template}
               timestamp={formatTime(post.created_at)}
               likes={post.react_count}
               comments={0}

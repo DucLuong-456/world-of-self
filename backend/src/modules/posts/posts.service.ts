@@ -1,10 +1,16 @@
 import { Post } from '@entities/Post';
 import { PostReact } from '@entities/PostReact';
-import { StoredImage } from '@entities/StoredImage';
+import { PostImage } from '@entities/PostImage';
+import { PostTemplate } from '@entities/PostTemplate';
 import { User } from '@entities/User';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -13,6 +19,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { BUCKET_NAME } from '@modules/minio/minio.config';
 import { MinioService } from '@modules/minio/minio.service';
 import { PaginatedPosts } from '@dtos/pagination.dto';
+
+const MAX_IMAGES = 10;
+const MAX_TEMPLATE_CONTENT_LENGTH = 150;
 
 @Injectable()
 export class PostsService {
@@ -23,10 +32,14 @@ export class PostsService {
     private readonly postRepository: EntityRepository<Post>,
     @InjectRepository(PostReact)
     private readonly postReactRepository: EntityRepository<PostReact>,
+    @InjectRepository(PostImage)
+    private readonly postImageRepository: EntityRepository<PostImage>,
+    @InjectRepository(PostTemplate)
+    private readonly postTemplateRepository: EntityRepository<PostTemplate>,
     private em: EntityManager,
     @Inject(REQUEST) protected request: Request,
     private readonly minioService: MinioService,
-  ) { }
+  ) {}
 
   async getPosts(data: SearchPostDto): Promise<PaginatedPosts> {
     const limit = data?.limit || 5;
@@ -45,7 +58,7 @@ export class PostsService {
         limit: limit,
         offset: (page - 1) * limit,
         orderBy: { created_at: 'DESC' },
-        populate: ['user.user_name', 'user.avatar', 'image'],
+        populate: ['user.user_name', 'user.avatar', 'images', 'template'],
       },
     );
 
@@ -62,12 +75,19 @@ export class PostsService {
     const postsWithUrls = await Promise.all(
       posts.map(async (post) => {
         post.is_reacted = reactedPostIds.has(post.id);
-        if (post.image?.path) {
-          post.image.path = await this.minioService.getFileUrl(
-            BUCKET_NAME,
-            post.image.path,
+
+        // Resolve presigned URLs for all images
+        if (post.images?.isInitialized()) {
+          await Promise.all(
+            post.images.getItems().map(async (img) => {
+              img.path = await this.minioService.getFileUrl(
+                BUCKET_NAME,
+                img.path,
+              );
+            }),
           );
         }
+
         if (post.user?.avatar) {
           post.user.avatar = await this.minioService.getFileUrl(
             BUCKET_NAME,
@@ -92,7 +112,7 @@ export class PostsService {
     const userId = (this.request.user as User)?.id;
     const post = await this.postRepository.findOne(
       { id: postId },
-      { populate: ['user', 'image'] },
+      { populate: ['user', 'images', 'template'] },
     );
 
     if (post && userId) {
@@ -103,10 +123,11 @@ export class PostsService {
       post.is_reacted = !!reaction;
     }
 
-    if (post?.image?.path) {
-      post.image.path = await this.minioService.getFileUrl(
-        BUCKET_NAME,
-        post.image.path,
+    if (post?.images?.isInitialized()) {
+      await Promise.all(
+        post.images.getItems().map(async (img) => {
+          img.path = await this.minioService.getFileUrl(BUCKET_NAME, img.path);
+        }),
       );
     }
 
@@ -123,37 +144,55 @@ export class PostsService {
   async create(data: CreatePostDto) {
     const userId = (this.request.user as User)?.id;
 
+    // Validate image count
+    if (data.images && data.images.length > MAX_IMAGES) {
+      throw new BadRequestException(
+        `Chỉ được phép tải lên tối đa ${MAX_IMAGES} ảnh mỗi bài đăng.`,
+      );
+    }
+
+    // For text-only posts: only allow template if content is short enough
+    const isTextOnly = !data.images || data.images.length === 0;
+    const applyTemplate =
+      isTextOnly &&
+      data.template_id &&
+      data.content.length <= MAX_TEMPLATE_CONTENT_LENGTH;
+
     let post: Post;
     await this.em.begin();
     try {
-      let storedImage: StoredImage;
-
-      if (data.thumbnail) {
-        const extension = data.thumbnail.originalname.split('.').pop();
-        const fileName = `posts/${uuidv4()}.${extension}`;
-        await this.minioService.uploadFile(
-          BUCKET_NAME,
-          fileName,
-          data.thumbnail.buffer,
-          data.thumbnail.mimetype,
-        );
-
-        storedImage = this.em.create(StoredImage, {
-          path: fileName,
-          ext: extension,
-        });
-        await this.em.persistAndFlush(storedImage);
-      }
-
       post = this.postRepository.create({
         ...(data?.title && { title: data.title }),
         content: data.content,
         ...(data?.category && { category: data.category }),
         user_id: userId,
-        stored_image_id: storedImage.id,
+        ...(applyTemplate && { template_id: data.template_id }),
       });
-
       await this.em.persistAndFlush(post);
+
+      // Upload images in parallel and create PostImage records
+      if (data.images && data.images.length > 0) {
+        const imageEntities = await Promise.all(
+          data.images.map(async (file, index) => {
+            const extension = file.originalname.split('.').pop();
+            const fileName = `posts/${uuidv4()}.${extension}`;
+            await this.minioService.uploadFile(
+              BUCKET_NAME,
+              fileName,
+              file.buffer,
+              file.mimetype,
+            );
+            return this.em.create(PostImage, {
+              path: fileName,
+              ext: extension,
+              post: post, // Pass the parent entity reference
+              sort_order: index,
+            });
+          }),
+        );
+        await this.em.persistAndFlush(imageEntities);
+      }
+
       await this.em.commit();
     } catch (error) {
       await this.em.rollback();
@@ -161,6 +200,10 @@ export class PostsService {
     }
 
     return post;
+  }
+
+  async getTemplates() {
+    return this.postTemplateRepository.findAll();
   }
 
   async toggleReact(postId: string) {

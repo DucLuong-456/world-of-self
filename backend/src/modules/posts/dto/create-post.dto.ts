@@ -18,12 +18,17 @@ export class CreatePostDto {
   @IsOptional()
   category?: PostCategory;
 
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  template_id?: string;
+
   @ApiProperty({
-    type: 'string',
-    format: 'binary',
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
     nullable: true,
     required: false,
   })
   @IsOptional()
-  thumbnail?: Express.Multer.File | null;
+  images?: Express.Multer.File[];
 }

@@ -3,6 +3,7 @@ import {
   CreatePostPayload,
   PaginatedPosts,
   Post,
+  PostTemplate,
   SearchPostParams,
 } from "@/types/post";
 
@@ -10,7 +11,6 @@ export const getPosts = async (
   params?: SearchPostParams,
 ): Promise<PaginatedPosts> => {
   const { data: res } = await apiClient.get("/posts", { params });
-  // Backend TransformInterceptor returns { data: Post[], paging }
   return { posts: res.data, paging: res.paging };
 };
 
@@ -19,7 +19,10 @@ export const createPost = async (payload: CreatePostPayload): Promise<Post> => {
   if (payload.title) formData.append("title", payload.title);
   formData.append("content", payload.content);
   if (payload.category) formData.append("category", payload.category);
-  if (payload.thumbnail) formData.append("thumbnail", payload.thumbnail);
+  if (payload.template_id) formData.append("template_id", payload.template_id);
+  if (payload.images?.length) {
+    payload.images.forEach((file) => formData.append("images", file));
+  }
 
   const { data } = await apiClient.post("/posts", formData, {
     headers: { "Content-Type": "multipart/form-data" },
@@ -30,4 +33,9 @@ export const createPost = async (payload: CreatePostPayload): Promise<Post> => {
 export const toggleReact = async (postId: string) => {
   const { data } = await apiClient.patch(`/posts/${postId}/react`);
   return data;
+};
+
+export const getPostTemplates = async (): Promise<PostTemplate[]> => {
+  const { data } = await apiClient.get("/posts/templates");
+  return data?.data ?? [];
 };

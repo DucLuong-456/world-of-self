@@ -4,13 +4,13 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
-  OneToOne,
   Property,
 } from '@mikro-orm/core';
 import { CustomBaseEntityWithDeletedAt } from './CustomBaseEntityWithDeletedAt';
-import { StoredImage } from './StoredImage';
 import { User } from './User';
 import { PostReact } from './PostReact';
+import { PostImage } from './PostImage';
+import { PostTemplate } from './PostTemplate';
 
 @Entity({ tableName: 'posts' })
 export class Post extends CustomBaseEntityWithDeletedAt {
@@ -32,8 +32,8 @@ export class Post extends CustomBaseEntityWithDeletedAt {
   @Property({ type: 'varchar', nullable: true, default: null })
   category: PostCategory;
 
-  @Property()
-  stored_image_id: string;
+  @Property({ nullable: true, default: null })
+  template_id: string | null;
 
   @ManyToOne({
     entity: () => User,
@@ -43,13 +43,19 @@ export class Post extends CustomBaseEntityWithDeletedAt {
   })
   user!: User;
 
-  @OneToOne({
-    entity: () => StoredImage,
+  @ManyToOne({
+    entity: () => PostTemplate,
     nullable: true,
-    inversedBy: (storedImage) => storedImage.post,
-    joinColumn: 'stored_image_id',
+    joinColumn: 'template_id',
   })
-  image: StoredImage;
+  template: PostTemplate | null;
+
+  @OneToMany({
+    entity: () => PostImage,
+    mappedBy: (img) => img.post,
+    orderBy: { sort_order: 'ASC' },
+  })
+  images = new Collection<PostImage>(this);
 
   @OneToMany({
     entity: () => PostReact,
