@@ -1,7 +1,8 @@
-import { Entity, OneToOne, Property } from '@mikro-orm/core';
+import { Entity, Property } from '@mikro-orm/core';
 import { CustomBaseEntityWithDeletedAt } from './CustomBaseEntityWithDeletedAt';
-import { Post } from './Post';
 
+// StoredImage is still used for User avatar and cover_avatar storage.
+// The Post→PostImage relationship has been moved to the PostImage entity.
 @Entity({ tableName: 'stored_images' })
 export class StoredImage extends CustomBaseEntityWithDeletedAt {
   @Property()
@@ -9,10 +10,4 @@ export class StoredImage extends CustomBaseEntityWithDeletedAt {
 
   @Property()
   ext: string;
-
-  @OneToOne({
-    entity: () => Post,
-    mappedBy: (post) => post.image,
-  })
-  post: Post;
 }

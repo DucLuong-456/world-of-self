@@ -6,10 +6,19 @@ export enum PostCategory {
   Entertainment = "entertainment",
 }
 
-export interface StoredImage {
+export interface PostImage {
   id: string;
   path: string;
   ext: string;
+  sort_order: number;
+}
+
+export interface PostTemplate {
+  id: string;
+  name: string;
+  bg_color: string;
+  text_color: string;
+  font_style: string | null;
 }
 
 export interface Post {
@@ -19,8 +28,9 @@ export interface Post {
   react_count: number;
   user_id: string;
   category?: PostCategory;
-  stored_image_id?: string;
-  image?: StoredImage;
+  template_id?: string;
+  images?: PostImage[];
+  template?: PostTemplate | null;
   user?: User;
   is_reacted?: boolean;
   created_at: string;
@@ -47,5 +57,6 @@ export interface CreatePostPayload {
   title?: string;
   content: string;
   category?: PostCategory;
-  thumbnail?: File;
+  images?: File[];
+  template_id?: string;
 }

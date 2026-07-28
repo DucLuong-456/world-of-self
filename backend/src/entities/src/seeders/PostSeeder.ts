@@ -1,14 +1,15 @@
 import { PostCategory } from '@constants/postCategory';
 import { User } from '@entities/User';
 import { Post } from '@entities/Post';
-import { StoredImage } from '@entities/StoredImage';
+import { PostImage } from '@entities/PostImage';
 import { faker } from '@faker-js/faker';
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
+import { v4 as uuidv4 } from 'uuid';
 
 export class PostSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
-    const batchSize = 2000; // Giảm xuống 2000 vì mỗi user có thể có 5 posts (tổng ~10k records/batch)
+    const batchSize = 2000;
     const totalUsers = await em.count(User);
 
     for (let i = 0; i < totalUsers; i += batchSize) {
@@ -26,52 +27,39 @@ export class PostSeeder extends Seeder {
       if (users.length === 0) break;
       console.log(`Processing user batch ${i} to ${i + users.length}`);
 
+      const postDatas: any[] = [];
       const imageDatas: any[] = [];
-      const userPostMap: { userId: string; numPosts: number }[] = [];
 
-      // 1. Chuẩn bị dữ liệu Image trước
       for (const user of users) {
         const numPosts = faker.number.int({ min: 1, max: 5 });
-        userPostMap.push({ userId: user.id, numPosts });
 
         for (let j = 0; j < numPosts; j++) {
+          const postId = uuidv4();
+          const post = em.create(Post, {
+            id: postId,
+            title: faker.string.alphanumeric(10),
+            content: faker.lorem.sentence(),
+            react_count: 1,
+            user_id: user.id,
+            category: PostCategory.News,
+            created_at: new Date(),
+          });
+          postDatas.push(post);
+
+          // Attach 1 fake image per post
           imageDatas.push(
-            em.create(StoredImage, {
+            em.create(PostImage, {
               path: faker.image.url(),
               ext: 'jpg',
+              post: post,
+              sort_order: 0,
             }),
           );
         }
       }
 
-      // 2. Upsert Images hàng loạt để lấy IDs
-      // Lưu ý: upsertMany sẽ trả về các thực thể có ID nếu dùng Postgres
-      const createdImages = await em.upsertMany(StoredImage, imageDatas);
-
-      // 3. Chuẩn bị dữ liệu Post
-      const postDatas: any[] = [];
-      let imageIdx = 0;
-
-      for (const item of userPostMap) {
-        for (let j = 0; j < item.numPosts; j++) {
-          const image = createdImages[imageIdx++];
-          postDatas.push(
-            em.create(Post, {
-              title: faker.string.alphanumeric(10),
-              react_count: 1,
-              user_id: item.userId, // Khóa ngoại
-              stored_image_id: image.id, // Khóa ngoại từ ảnh vừa tạo
-              category: PostCategory.News,
-              created_at: new Date(),
-            }),
-          );
-        }
-      }
-
-      // 4. Upsert Posts hàng loạt
       await em.upsertMany(Post, postDatas);
-
-      // 5. Giải phóng bộ nhớ cực kỳ quan trọng cho 1.1tr record
+      await em.upsertMany(PostImage, imageDatas);
       em.clear();
     }
 

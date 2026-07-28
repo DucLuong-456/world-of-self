@@ -1,6 +1,6 @@
 import { UserRole } from '@constants/userRole.enum';
 import { User } from '@entities/User';
-import { appSwaggerTag } from '@modules/swagger-app/swagger-app.constant';
+import { appSwaggerTag } from '@modules/swagger/swagger-app.constant';
 import {
   Body,
   Controller,

@@ -5,12 +5,22 @@ import { SeedManager } from '@mikro-orm/seeder';
 import { User } from '@entities/User';
 import { Post } from '@entities/Post';
 import { PostReact } from '@entities/PostReact';
+import { PostImage } from '@entities/PostImage';
+import { PostTemplate } from '@entities/PostTemplate';
 import { StoredImage } from '@entities/StoredImage';
 import { UserRelationship } from '@entities/UserRelationship';
 dotenv.config();
 
 export default defineConfig({
-  entities: [User, Post, PostReact, StoredImage, UserRelationship],
+  entities: [
+    User,
+    Post,
+    PostReact,
+    PostImage,
+    PostTemplate,
+    StoredImage,
+    UserRelationship,
+  ],
   entitiesTs: ['./src/entities/src/entities'],
   host: process.env.POSTGRES_HOST,
   dbName: process.env.POSTGRES_DB,
