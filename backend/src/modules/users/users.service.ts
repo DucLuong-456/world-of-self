@@ -6,6 +6,8 @@ import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { GetUsersDto } from './dto/get-users.dto';
 import { SearchFriendDto } from './dto/search-friend.dto';
+import { MinioService } from '@modules/minio/minio.service';
+import { BUCKET_NAME } from '@modules/minio/minio.config';
 
 @Injectable()
 export class UsersService {
@@ -15,6 +17,7 @@ export class UsersService {
     @InjectRepository(UserRelationship)
     private readonly userRelationshipRepository: EntityRepository<UserRelationship>,
     private em: EntityManager,
+    private readonly minioService: MinioService,
   ) {}
 
   async getFriends(userId: string, data: SearchFriendDto) {
@@ -81,16 +84,24 @@ export class UsersService {
 
   async findOne(id: string) {
     const user = await this.userRepository.findOneOrFail(
+      { id },
       {
-        id: id,
-      },
-      {
-        populate: ['posts'],
+        populate: ['profile', 'posts'],
         failHandler: () => {
           throw new NotFoundException('user not found!');
         },
       },
     );
+
+    if (user.avatar) {
+      user.avatar = await this.minioService.getFileUrl(BUCKET_NAME, user.avatar);
+    }
+    if (user.profile?.cover_avatar) {
+      user.profile.cover_avatar = await this.minioService.getFileUrl(
+        BUCKET_NAME,
+        user.profile.cover_avatar,
+      );
+    }
 
     return user;
   }
