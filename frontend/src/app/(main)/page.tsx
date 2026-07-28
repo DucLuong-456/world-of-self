@@ -52,6 +52,7 @@ export default function HomePage() {
                   ?.toLowerCase()
                   .replace(/\s+/g, ""),
                 avatar: post.user?.avatar,
+                userId: post.user_id,
               }}
               content={post.content}
               images={post.images ?? []}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,11 +20,15 @@ interface PostCardProps {
     name: string;
     username?: string;
     avatar?: string;
+    userId?: string;
   };
   content: string;
   images?: PostImage[];
   template?: PostTemplate | null;
   timestamp: string;
+  likes?: number;
+  comments?: number;
+  shares?: number;
   isLiked?: boolean;
   onReact?: () => void;
 }
@@ -261,15 +266,19 @@ export function PostCard({
         {/* Header */}
         <div className="flex items-center justify-between p-4 pb-2">
           <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 border shadow-sm cursor-pointer">
-              <AvatarImage src={author.avatar} alt={author.name} />
-              <AvatarFallback>{author.name[0] || "U"}</AvatarFallback>
-            </Avatar>
+            <Link href={author.userId ? `/profile/${author.userId}` : "#"}>
+              <Avatar className="h-10 w-10 border shadow-sm cursor-pointer hover:opacity-80 transition-opacity">
+                <AvatarImage src={author.avatar} alt={author.name} />
+                <AvatarFallback>{author.name[0] || "U"}</AvatarFallback>
+              </Avatar>
+            </Link>
             <div>
-              <p className="text-[15px] font-semibold text-card-foreground leading-tight hover:underline cursor-pointer">
-                {author.name}
-              </p>
-              <p className="text-[13px] text-muted-foreground flex items-center gap-1 hover:underline cursor-pointer">
+              <Link href={author.userId ? `/profile/${author.userId}` : "#"}>
+                <p className="text-[15px] font-semibold text-card-foreground leading-tight hover:underline cursor-pointer">
+                  {author.name}
+                </p>
+              </Link>
+              <p className="text-[13px] text-muted-foreground flex items-center gap-1">
                 {timestamp}
               </p>
             </div>

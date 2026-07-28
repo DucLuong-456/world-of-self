@@ -25,3 +25,8 @@ export const updateProfile = async (
   const { data: res } = await apiClient.patch("/user", data);
   return res;
 };
+
+export const getUserById = async (id: string): Promise<User> => {
+  const { data } = await apiClient.get(`/users/${id}`);
+  return data?.data;
+};
