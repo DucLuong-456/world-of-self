@@ -37,6 +37,7 @@ function PostCard({ post }: { post: Post }) {
   if (hasImage) {
     return (
       <div className="group relative aspect-square overflow-hidden rounded-xl border border-border shadow-sm cursor-pointer">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={firstImage.path}
           alt="Post"
@@ -119,6 +120,7 @@ export function ProfileView({
       {/* Cover & Avatar */}
       <div className="relative">
         <div className="h-48 w-full rounded-xl bg-gradient-to-r from-primary/30 via-primary/20 to-accent/30 overflow-hidden border border-border relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={coverUrl}
             alt="Cover"

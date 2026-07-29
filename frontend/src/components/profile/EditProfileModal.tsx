@@ -84,9 +84,10 @@ export function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
       await updateProfile(values);
       toast.success("Cập nhật thông tin thành công");
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { message?: string } } };
       const errorMessage =
-        error?.response?.data?.message || "Cập nhật thất bại";
+        axiosError?.response?.data?.message || "Cập nhật thất bại";
       toast.error(errorMessage);
     }
   };
