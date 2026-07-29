@@ -10,6 +10,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -105,11 +106,12 @@ export function PostMediaViewer({
 
           {/* Current Image */}
           <div className="w-full h-full p-4 flex items-center justify-center relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={images[currentIndex].path}
               alt={`Ảnh ${currentIndex + 1}`}
-              className="max-w-full max-h-full object-contain"
+              fill
+              quality={100}
+              className="object-contain p-4"
             />
           </div>
 
