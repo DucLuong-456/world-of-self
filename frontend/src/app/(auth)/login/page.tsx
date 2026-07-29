@@ -86,7 +86,7 @@ export default function LoginPage() {
         if (!response.ok) {
           throw new Error("Google login failed");
         }
-        await queryClient.invalidateQueries({ queryKey: [QueryKey.user] });
+        queryClient.invalidateQueries({ queryKey: [QueryKey.user] });
 
         route.push("/");
       } catch (error) {

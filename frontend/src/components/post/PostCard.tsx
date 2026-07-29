@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -52,13 +53,14 @@ function PostImageGrid({
     <div className="rounded-lg overflow-hidden border border-border">
       {count === 1 && (
         <div
-          className="w-full bg-muted cursor-pointer hover:opacity-95 transition-opacity"
+          className="relative w-full overflow-hidden bg-muted cursor-pointer hover:opacity-95 transition-opacity"
           onClick={() => onImageClick(0)}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={visibleImages[0].path}
             alt="Post image"
+            width={1200}
+            height={800}
             className="w-full h-auto max-h-[600px] object-cover"
           />
         </div>
@@ -69,14 +71,15 @@ function PostImageGrid({
           {visibleImages.map((img, idx) => (
             <div
               key={img.id}
-              className="w-full h-full bg-muted cursor-pointer hover:opacity-95 transition-opacity"
+              className="relative w-full h-full min-h-0 bg-muted cursor-pointer hover:opacity-95 transition-opacity overflow-hidden"
               onClick={() => onImageClick(idx)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={img.path}
                 alt={`Post img ${idx}`}
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 50vw, 400px"
+                className="object-cover"
               />
             </div>
           ))}
@@ -86,37 +89,40 @@ function PostImageGrid({
       {count === 3 && (
         <div className="grid grid-cols-2 gap-[2px] h-[400px]">
           <div
-            className="w-full h-full bg-muted col-span-1 border-r-[2px] border-background cursor-pointer hover:opacity-95 transition-opacity"
+            className="relative w-full h-full min-h-0 bg-muted col-span-1 border-r-[2px] border-background cursor-pointer hover:opacity-95 transition-opacity overflow-hidden"
             onClick={() => onImageClick(0)}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={visibleImages[0].path}
-              alt="Post img 0"
-              className="w-full h-full object-cover"
-            />
+            <Image
+                src={visibleImages[0].path}
+                alt="Post img 0"
+                fill
+                sizes="(max-width: 768px) 50vw, 400px"
+                className="object-cover"
+              />
           </div>
           <div className="grid grid-rows-2 gap-[2px] h-full col-span-1">
             <div
-              className="w-full h-full bg-muted cursor-pointer hover:opacity-95 transition-opacity"
+              className="relative w-full h-full min-h-0 bg-muted cursor-pointer hover:opacity-95 transition-opacity overflow-hidden"
               onClick={() => onImageClick(1)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={visibleImages[1].path}
                 alt="Post img 1"
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 50vw, 400px"
+                className="object-cover"
               />
             </div>
             <div
-              className="w-full h-full bg-muted cursor-pointer hover:opacity-95 transition-opacity"
+              className="relative w-full h-full min-h-0 bg-muted cursor-pointer hover:opacity-95 transition-opacity overflow-hidden"
               onClick={() => onImageClick(2)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={visibleImages[2].path}
                 alt="Post img 2"
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 50vw, 400px"
+                className="object-cover"
               />
             </div>
           </div>
@@ -128,14 +134,15 @@ function PostImageGrid({
           {visibleImages.map((img, idx) => (
             <div
               key={img.id}
-              className="w-full h-full bg-muted cursor-pointer hover:opacity-95 transition-opacity"
+              className="relative w-full h-full min-h-0 bg-muted cursor-pointer hover:opacity-95 transition-opacity overflow-hidden"
               onClick={() => onImageClick(idx)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={img.path}
                 alt={`Post img ${idx}`}
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 50vw, 250px"
+                className="object-cover"
               />
             </div>
           ))}
@@ -146,63 +153,68 @@ function PostImageGrid({
         <div className="flex flex-col gap-[2px] h-[500px]">
           <div className="grid grid-cols-2 gap-[2px] h-1/2">
             <div
-              className="w-full h-full bg-muted cursor-pointer hover:opacity-95 transition-opacity"
+              className="relative w-full h-full min-h-0 bg-muted cursor-pointer hover:opacity-95 transition-opacity overflow-hidden"
               onClick={() => onImageClick(0)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={visibleImages[0].path}
                 alt="Post img 0"
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 50vw, 300px"
+                className="object-cover"
               />
             </div>
             <div
-              className="w-full h-full bg-muted cursor-pointer hover:opacity-95 transition-opacity"
+              className="relative w-full h-full min-h-0 bg-muted cursor-pointer hover:opacity-95 transition-opacity overflow-hidden"
               onClick={() => onImageClick(1)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={visibleImages[1].path}
                 alt="Post img 1"
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 50vw, 300px"
+                className="object-cover"
               />
             </div>
           </div>
           <div className="grid grid-cols-3 gap-[2px] h-1/2">
             <div
-              className="w-full h-full bg-muted cursor-pointer hover:opacity-95 transition-opacity"
+              className="relative w-full h-full min-h-0 bg-muted cursor-pointer hover:opacity-95 transition-opacity overflow-hidden"
               onClick={() => onImageClick(2)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={visibleImages[2].path}
                 alt="Post img 2"
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 33vw, 200px"
+                className="object-cover"
               />
             </div>
             <div
-              className="w-full h-full bg-muted cursor-pointer hover:opacity-95 transition-opacity"
+              className="relative w-full h-full min-h-0 bg-muted cursor-pointer hover:opacity-95 transition-opacity overflow-hidden"
               onClick={() => onImageClick(3)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={visibleImages[3].path}
                 alt="Post img 3"
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 33vw, 200px"
+                className="object-cover"
               />
             </div>
             <div
-              className="w-full h-full bg-muted relative cursor-pointer hover:opacity-95 transition-opacity"
+              className="relative w-full h-full min-h-0 bg-muted cursor-pointer hover:opacity-95 transition-opacity overflow-hidden"
               onClick={() => onImageClick(4)}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={visibleImages[4].path}
                 alt="Post img 4"
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 33vw, 200px"
+                className="object-cover"
               />
               {remaining > 0 && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 hover:bg-black/60 transition-colors">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 hover:bg-black/60 transition-colors z-10">
                   <span className="text-white text-3xl font-semibold">
                     +{remaining}
                   </span>
