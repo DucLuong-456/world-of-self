@@ -61,6 +61,7 @@ function PostImageGrid({
             alt="Post image"
             width={1200}
             height={800}
+            priority
             className="w-full h-auto max-h-[600px] object-cover"
           />
         </div>
@@ -79,6 +80,7 @@ function PostImageGrid({
                 alt={`Post img ${idx}`}
                 fill
                 sizes="(max-width: 768px) 50vw, 400px"
+                priority={idx <= 1}
                 className="object-cover"
               />
             </div>
@@ -97,6 +99,7 @@ function PostImageGrid({
                 alt="Post img 0"
                 fill
                 sizes="(max-width: 768px) 50vw, 400px"
+                priority
                 className="object-cover"
               />
           </div>
@@ -142,6 +145,7 @@ function PostImageGrid({
                 alt={`Post img ${idx}`}
                 fill
                 sizes="(max-width: 768px) 50vw, 250px"
+                priority={idx <= 1}
                 className="object-cover"
               />
             </div>
@@ -161,6 +165,7 @@ function PostImageGrid({
                 alt="Post img 0"
                 fill
                 sizes="(max-width: 768px) 50vw, 300px"
+                priority
                 className="object-cover"
               />
             </div>

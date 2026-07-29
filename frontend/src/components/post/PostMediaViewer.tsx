@@ -86,7 +86,7 @@ export function PostMediaViewer({
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-4 left-4 z-50 text-white hover:bg-white/20 rounded-full h-10 w-10"
+            className="absolute top-4 left-4 z-50 text-white hover:bg-white/20 rounded-full h-10 w-10 focus-visible:ring-0 focus-visible:ring-offset-0"
             onClick={onClose}
           >
             <X className="h-6 w-6" />
@@ -97,7 +97,7 @@ export function PostMediaViewer({
             <Button
               variant="ghost"
               size="icon"
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-40 bg-white/10 hover:bg-white/20 text-white rounded-full h-12 w-12"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-40 bg-white/10 hover:bg-white/20 text-white rounded-full h-12 w-12 focus-visible:ring-0 focus-visible:ring-offset-0"
               onClick={handlePrev}
             >
               <ChevronLeft className="h-8 w-8" />
@@ -111,6 +111,7 @@ export function PostMediaViewer({
               alt={`Ảnh ${currentIndex + 1}`}
               fill
               quality={100}
+              priority
               className="object-contain p-4"
             />
           </div>
@@ -120,7 +121,7 @@ export function PostMediaViewer({
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-40 bg-white/10 hover:bg-white/20 text-white rounded-full h-12 w-12"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-40 bg-white/10 hover:bg-white/20 text-white rounded-full h-12 w-12 focus-visible:ring-0 focus-visible:ring-offset-0"
               onClick={handleNext}
             >
               <ChevronRight className="h-8 w-8" />

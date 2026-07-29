@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+
 import {
   Dialog,
   DialogContent,
@@ -28,7 +28,7 @@ export const LogoutModal = ({ open, onOpenChange }: LogoutModalProps) => {
       await logout();
       resetAuth();
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast.error("Đăng xuất không thành công. Vui lòng thử lại.");
     }
   };

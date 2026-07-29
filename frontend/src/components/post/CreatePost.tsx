@@ -17,7 +17,7 @@ import { useAuthStore } from "@/store/authStore";
 import { PostTemplate } from "@/types/post";
 import {
   Globe2,
-  Image,
+  Image as ImageIcon,
   Loader2,
   MapPin,
   Mic,
@@ -336,7 +336,7 @@ export function CreatePost() {
                 onClick={() => fileInputRef.current?.click()}
                 title="Ảnh/Video"
               >
-                <Image className="h-5 w-5 fill-green-500/20" />
+                <ImageIcon className="h-5 w-5 fill-green-500/20" />
               </Button>
               <Button
                 variant="ghost"

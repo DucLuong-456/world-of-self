@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, X, UserMinus, MessageCircle, Users, Search } from "lucide-react";
+import { UserMinus, MessageCircle, Users, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
