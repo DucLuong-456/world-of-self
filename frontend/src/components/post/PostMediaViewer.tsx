@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { CommentList } from "@/components/comment/CommentList";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,7 @@ interface PostMediaViewerProps {
   onClose: () => void;
   images: PostImage[];
   initialIndex?: number;
+  postId: string;
   postAuthor: {
     name: string;
     username?: string;
@@ -43,6 +45,7 @@ export function PostMediaViewer({
   onClose,
   images,
   initialIndex = 0,
+  postId,
   postAuthor,
   postContent,
   postTimestamp,
@@ -69,17 +72,23 @@ export function PostMediaViewer({
     if (currentIndex > 0) setCurrentIndex((prev) => prev - 1);
   };
 
-  if (!isOpen || images.length === 0) return null;
+  if (!isOpen) return null;
+  const hasImages = images.length > 0;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-full w-screen h-screen m-0 p-0 rounded-none border-none bg-black flex overflow-hidden">
-        <DialogTitle className="sr-only">Trình xem ảnh</DialogTitle>
+      <DialogContent 
+        hideClose
+        className={hasImages 
+        ? "max-w-full w-screen h-screen m-0 p-0 rounded-none border-none bg-black flex overflow-hidden" 
+        : "max-w-[600px] w-full max-h-[85vh] bg-background flex rounded-xl p-0 overflow-hidden"}>
+        <DialogTitle className="sr-only">Trình xem chi tiết bài viết</DialogTitle>
         <DialogDescription className="sr-only">
-          Hiển thị chi tiết ảnh của bài viết
+          Hiển thị chi tiết của bài viết
         </DialogDescription>
 
         {/* Left Side: Dark Media Viewer (~75%) */}
+        {hasImages && (
         <div className="flex-1 relative flex items-center justify-center bg-black/95 select-none touch-none">
           {/* Close Button */}
           <Button
@@ -125,9 +134,10 @@ export function PostMediaViewer({
             </Button>
           )}
         </div>
+        )}
 
         {/* Right Side: White Post Info Sidebar (~360px width) */}
-        <div className="w-[360px] shrink-0 bg-background flex flex-col border-l border-border relative overflow-y-auto custom-scrollbar">
+        <div className={hasImages ? "w-[360px] shrink-0 bg-background flex flex-col border-l border-border relative overflow-y-auto custom-scrollbar" : "w-full flex-1 flex flex-col relative overflow-y-auto custom-scrollbar"}>
           {/* Sidebar Header (Author) */}
           <div className="flex items-center justify-between p-4 border-b border-border">
             <div className="flex items-center gap-3">
@@ -144,13 +154,23 @@ export function PostMediaViewer({
                 </p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-muted-foreground rounded-full hover:bg-muted"
-            >
-              <MoreHorizontal className="h-5 w-5" />
-            </Button>
+            <div className="flex flex-col items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="h-8 w-8 text-muted-foreground hover:bg-muted"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:bg-muted"
+              >
+                <MoreHorizontal className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
 
           {/* Content */}
@@ -193,13 +213,9 @@ export function PostMediaViewer({
             </Button>
           </div>
 
-          {/* Comment Section Placeholder */}
-          <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-muted-foreground">
-            <MessageCircle className="h-12 w-12 mb-3 text-muted/30" />
-            <h4 className="font-semibold text-foreground">
-              Chưa có bình luận nào
-            </h4>
-            <p className="text-sm mt-1">Hãy là người đầu tiên bình luận.</p>
+          {/* Comment Section */}
+          <div className="flex-1 flex flex-col p-4 pt-1 overflow-hidden">
+            <CommentList postId={postId} />
           </div>
         </div>
       </DialogContent>

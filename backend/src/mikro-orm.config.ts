@@ -9,6 +9,7 @@ import { PostImage } from '@entities/PostImage';
 import { PostTemplate } from '@entities/PostTemplate';
 import { StoredImage } from '@entities/StoredImage';
 import { UserRelationship } from '@entities/UserRelationship';
+import { Comment } from '@entities/Comment';
 dotenv.config();
 
 export default defineConfig({
@@ -20,6 +21,7 @@ export default defineConfig({
     PostTemplate,
     StoredImage,
     UserRelationship,
+    Comment,
   ],
   entitiesTs: ['./src/entities/src/entities'],
   host: process.env.POSTGRES_HOST,
