@@ -13,6 +13,7 @@ import { PostsModule } from './modules/posts/posts.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { VideosModule } from './modules/videos/videos.module';
 import { MinioModule } from '@modules/minio/minio.module';
+import { CommentsModule } from './modules/comments/comments.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { MinioModule } from '@modules/minio/minio.module';
     PostsModule,
     VideosModule,
     MinioModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

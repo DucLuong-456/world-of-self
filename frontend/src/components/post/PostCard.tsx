@@ -15,6 +15,7 @@ import { PostImage, PostTemplate } from "@/types/post";
 import { PostMediaViewer } from "./PostMediaViewer";
 
 interface PostCardProps {
+  postId: string;
   author: {
     name: string;
     username?: string;
@@ -239,6 +240,7 @@ function PostTextTemplate({
 
 // --- PostCard ---
 export function PostCard({
+  postId,
   author,
   content,
   images = [],
@@ -335,6 +337,7 @@ export function PostCard({
           </Button>
           <Button
             variant="ghost"
+            onClick={() => setViewerIndex(0)}
             className="flex-1 gap-2 text-muted-foreground hover:bg-muted font-semibold text-[14px]"
           >
             <MessageCircle className="h-5 w-5" />
@@ -357,6 +360,7 @@ export function PostCard({
           onClose={() => setViewerIndex(null)}
           images={images}
           initialIndex={viewerIndex}
+          postId={postId}
           postAuthor={author}
           postContent={content}
           postTimestamp={timestamp}
