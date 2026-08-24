@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetPosts } from "@/hooks/post/useGetPosts";
+import { useToggleReactMutation } from "@/hooks/post/useToggleReactMutation";
 import { Post } from "@/types/post";
 import { User } from "@/types/user";
 import {
@@ -11,7 +12,6 @@ import {
   Calendar,
   Camera,
   Edit,
-  Heart,
   LinkIcon,
   Loader2,
   MapPin,
@@ -19,6 +19,17 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useRef } from "react";
+import { PostCard } from "@/components/post/PostCard";
+
+const formatTime = (dateStr: string) => {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "Vừa xong";
+  if (minutes < 60) return `${minutes} phút trước`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} giờ trước`;
+  return `${Math.floor(hours / 24)} ngày trước`;
+};
 
 interface ProfileViewProps {
   user: User;
@@ -28,59 +39,6 @@ interface ProfileViewProps {
   onEditAvatar?: (file: File) => void;
   onEditCover?: (file: File) => void;
   onEditProfile?: () => void;
-}
-
-function PostCard({ post }: { post: Post }) {
-  const firstImage = post.images?.[0];
-  const hasImage = !!firstImage;
-
-  if (hasImage) {
-    return (
-      <div className="group relative aspect-square overflow-hidden rounded-xl border border-border shadow-sm cursor-pointer">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={firstImage.path}
-          alt="Post"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
-        <div className="absolute inset-0 flex items-center justify-center gap-6 bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100 backdrop-blur-[2px]">
-          <span className="flex items-center gap-2 text-sm font-bold text-white">
-            <Heart className="h-4 w-4 fill-white" /> {post.react_count}
-          </span>
-          <span className="flex items-center gap-2 text-sm font-bold text-white">
-            <MessageCircle className="h-4 w-4 fill-white" /> 0
-          </span>
-        </div>
-      </div>
-    );
-  }
-
-  // Text-only post (with or without template)
-  return (
-    <div
-      className="group relative aspect-square overflow-hidden rounded-xl border border-border shadow-sm cursor-pointer flex items-center justify-center p-4"
-      style={post.template ? { background: post.template.bg_color } : undefined}
-    >
-      <p
-        className="text-sm font-semibold text-center line-clamp-4 leading-snug"
-        style={
-          post.template
-            ? {
-                color: post.template.text_color,
-                fontStyle: post.template.font_style || "normal",
-              }
-            : undefined
-        }
-      >
-        {post.content}
-      </p>
-      <div className="absolute inset-0 flex items-center justify-center gap-4 bg-black/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        <span className="flex items-center gap-1 text-sm font-bold text-white">
-          <Heart className="h-4 w-4 fill-white" /> {post.react_count}
-        </span>
-      </div>
-    </div>
-  );
 }
 
 export function ProfileView({
@@ -99,7 +57,8 @@ export function ProfileView({
     userId: user.id,
     limit: 20,
   });
-  const posts = postsData?.posts ?? [];
+  const posts: Post[] = postsData?.posts ?? [];
+  const { mutate: toggleReact } = useToggleReactMutation();
 
   const displayName = user.user_name || "User";
   const bio = user.profile?.bio || (isOwnProfile ? "Chưa có tiểu sử" : "");
@@ -313,7 +272,10 @@ export function ProfileView({
         </TabsList>
 
         <div className="min-h-[400px]">
-          <TabsContent value="posts" className="mt-0 animate-in fade-in duration-500">
+          <TabsContent
+            value="posts"
+            className="mt-0 animate-in fade-in duration-500"
+          >
             {isLoadingPosts ? (
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -327,15 +289,37 @@ export function ProfileView({
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              <div className="space-y-4">
                 {posts.map((post) => (
-                  <PostCard key={post.id} post={post} />
+                  <PostCard
+                    key={post.id}
+                    author={{
+                      name: post.user?.user_name ?? user.user_name ?? "Ẩn danh",
+                      username: post.user?.user_name
+                        ?.toLowerCase()
+                        .replace(/\s+/g, ""),
+                      avatar: post.user?.avatar ?? user.avatar,
+                      userId: post.user_id,
+                    }}
+                    content={post.content}
+                    images={post.images ?? []}
+                    template={post.template}
+                    timestamp={formatTime(post.created_at)}
+                    likes={post.react_count}
+                    comments={0}
+                    shares={0}
+                    isLiked={post.is_reacted}
+                    onReact={() => toggleReact(post.id)}
+                  />
                 ))}
               </div>
             )}
           </TabsContent>
 
-          <TabsContent value="photos" className="mt-0 animate-in fade-in duration-500">
+          <TabsContent
+            value="photos"
+            className="mt-0 animate-in fade-in duration-500"
+          >
             <div className="rounded-xl border border-border bg-card p-12 text-center shadow-sm">
               <p className="text-sm font-medium text-muted-foreground">
                 Ảnh sẽ xuất hiện ở đây.
@@ -343,7 +327,10 @@ export function ProfileView({
             </div>
           </TabsContent>
 
-          <TabsContent value="likes" className="mt-0 animate-in fade-in duration-500">
+          <TabsContent
+            value="likes"
+            className="mt-0 animate-in fade-in duration-500"
+          >
             <div className="rounded-xl border border-border bg-card p-12 text-center shadow-sm">
               <p className="text-sm font-medium text-muted-foreground">
                 Các bài viết đã thích sẽ xuất hiện ở đây.
