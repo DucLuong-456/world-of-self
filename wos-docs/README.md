@@ -14,6 +14,7 @@ Chào mừng đến với tài liệu kỹ thuật của dự án **World of Sel
   - Điểm danh hàng ngày (Daily Check-in)
   - Vòng quay may mắn (Lucky Spin)
   - Hệ thống Nhiệm vụ (Quest System)
+  - Khu Trò Chơi (Game Center)
 - **[Kiến trúc (Architecture)](./architecture/)**
   - Database schema & Entities
   - Auth & Security

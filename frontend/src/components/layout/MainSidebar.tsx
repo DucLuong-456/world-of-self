@@ -13,6 +13,7 @@ import {
   RotateCw,
   CalendarCheck,
   PackageOpen,
+  Gamepad2,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -42,6 +43,8 @@ const navItems = [
     href: "/inventory",
   },
   { id: "wallet", label: "Ví Ngọc Vàng", icon: Gem, href: "/wallet" },
+  { id: "divider2", label: "", icon: null, href: "", divider: true },
+  { id: "games", label: "Trò chơi", icon: Gamepad2, href: "/games" },
   { id: "spin", label: "Vòng quay", icon: RotateCw, href: "/spin" },
   { id: "checkin", label: "Điểm danh", icon: CalendarCheck, href: "/checkin" },
 ];

@@ -17,6 +17,7 @@ import { InviteCode } from '@entities/InviteCode';
 import { InviteCodeUsage } from '@entities/InviteCodeUsage';
 import { DailyCheckIn } from '@entities/DailyCheckIn';
 import { SpinHistory } from '@entities/SpinHistory';
+import { GameSession } from '@entities/GameSession';
 dotenv.config();
 
 export default defineConfig({
@@ -36,6 +37,7 @@ export default defineConfig({
     InviteCodeUsage,
     DailyCheckIn,
     SpinHistory,
+    GameSession,
   ],
   entitiesTs: ['./src/entities/src/entities'],
   host: process.env.POSTGRES_HOST,

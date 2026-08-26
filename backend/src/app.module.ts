@@ -18,6 +18,7 @@ import { ItemsModule } from './modules/items/items.module';
 import { UserItemsModule } from './modules/user-items/user-items.module';
 import { DailyCheckInModule } from './modules/daily-checkin/daily-checkin.module';
 import { SpinModule } from './modules/spin/spin.module';
+import { GamesModule } from './modules/games/games.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { SpinModule } from './modules/spin/spin.module';
     UserItemsModule,
     DailyCheckInModule,
     SpinModule,
+    GamesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

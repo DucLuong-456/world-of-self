@@ -11,6 +11,8 @@ export enum GemTxType {
   SPEND_BUY = 'spend_buy',
   TRANSFER_SEND = 'transfer_send',
   TRANSFER_RECV = 'transfer_recv',
+  SPEND_GAME = 'spend_game',
+  EARN_GAME = 'earn_game',
 }
 
 @Entity({ tableName: 'gem_transactions' })
