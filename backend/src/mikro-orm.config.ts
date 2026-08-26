@@ -9,6 +9,14 @@ import { PostImage } from '@entities/PostImage';
 import { PostTemplate } from '@entities/PostTemplate';
 import { StoredImage } from '@entities/StoredImage';
 import { UserRelationship } from '@entities/UserRelationship';
+import { GemWallet } from '@entities/GemWallet';
+import { GemTransaction } from '@entities/GemTransaction';
+import { Item } from '@entities/Item';
+import { UserItem } from '@entities/UserItem';
+import { InviteCode } from '@entities/InviteCode';
+import { InviteCodeUsage } from '@entities/InviteCodeUsage';
+import { DailyCheckIn } from '@entities/DailyCheckIn';
+import { SpinHistory } from '@entities/SpinHistory';
 dotenv.config();
 
 export default defineConfig({
@@ -20,6 +28,14 @@ export default defineConfig({
     PostTemplate,
     StoredImage,
     UserRelationship,
+    GemWallet,
+    GemTransaction,
+    Item,
+    UserItem,
+    InviteCode,
+    InviteCodeUsage,
+    DailyCheckIn,
+    SpinHistory,
   ],
   entitiesTs: ['./src/entities/src/entities'],
   host: process.env.POSTGRES_HOST,

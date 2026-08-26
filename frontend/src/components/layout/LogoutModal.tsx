@@ -1,6 +1,5 @@
 "use client";
 
-
 import {
   Dialog,
   DialogContent,
@@ -13,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/authStore";
 import { useLogoutMutation } from "@/hooks/user/useLoginMutation";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface LogoutModalProps {
   open: boolean;
@@ -22,12 +22,14 @@ interface LogoutModalProps {
 export const LogoutModal = ({ open, onOpenChange }: LogoutModalProps) => {
   const { resetAuth } = useAuthStore();
   const { mutateAsync: logout, isPending } = useLogoutMutation();
+  const router = useRouter();
 
   const handleLogout = async () => {
     try {
       await logout();
       resetAuth();
       onOpenChange(false);
+      router.push("/login");
     } catch {
       toast.error("Đăng xuất không thành công. Vui lòng thử lại.");
     }
@@ -39,7 +41,8 @@ export const LogoutModal = ({ open, onOpenChange }: LogoutModalProps) => {
         <DialogHeader>
           <DialogTitle className="text-center">Confirm Logout</DialogTitle>
           <DialogDescription className="text-center">
-            Are you sure you want to log out? You will need to log back in to access your account.
+            Are you sure you want to log out? You will need to log back in to
+            access your account.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-center">

@@ -8,6 +8,11 @@ import {
   Settings,
   LogOut,
   Search,
+  Store,
+  Gem,
+  RotateCw,
+  CalendarCheck,
+  PackageOpen,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,6 +33,17 @@ const navItems = [
     badge: 3,
   },
   { id: "profile", label: "Profile", icon: User, href: "/profile/me" },
+  { id: "divider", label: "", icon: null, href: "", divider: true },
+  { id: "shop", label: "Cửa hàng", icon: Store, href: "/shop" },
+  {
+    id: "inventory",
+    label: "Kho đồ",
+    icon: PackageOpen,
+    href: "/inventory",
+  },
+  { id: "wallet", label: "Ví Ngọc Vàng", icon: Gem, href: "/wallet" },
+  { id: "spin", label: "Vòng quay", icon: RotateCw, href: "/spin" },
+  { id: "checkin", label: "Điểm danh", icon: CalendarCheck, href: "/checkin" },
 ];
 
 import { useState } from "react";
@@ -65,7 +81,15 @@ export const MainSidebar = () => {
       <nav className="flex-1 px-3">
         <ul className="space-y-1">
           {navItems.map((item) => {
-            const Icon = item.icon;
+            if (item.divider) {
+              return (
+                <li
+                  key={item.id}
+                  className="my-2 border-t border-sidebar-border"
+                />
+              );
+            }
+            const Icon = item.icon!;
             const isActive =
               pathname === item.href ||
               (item.id === "profile" && pathname.startsWith("/profile"));
@@ -78,9 +102,17 @@ export const MainSidebar = () => {
                     isActive
                       ? "bg-sidebar-accent text-sidebar-primary"
                       : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground",
+                    item.id === "wallet" && isActive && "text-blue-500",
+                    item.id === "shop" && isActive && "text-indigo-500",
                   )}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon
+                    className={cn(
+                      "h-5 w-5",
+                      item.id === "wallet" && "text-blue-400",
+                      item.id === "shop" && "text-indigo-400",
+                    )}
+                  />
                   <span>{item.label}</span>
                   {item.badge ? (
                     <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">

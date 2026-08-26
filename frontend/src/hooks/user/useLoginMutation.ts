@@ -18,8 +18,8 @@ export const useLogoutMutation = () => {
 
   return useMutation({
     mutationFn: () => logoutApi(),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [QueryKey.user] });
+    onSuccess: () => {
+      queryClient.clear();
     },
   });
 };
