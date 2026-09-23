@@ -83,44 +83,44 @@ export class MigrationWithTimestamps extends Migration {
   renameIndex(oldIndexName: string, newIndexName: string) {
     this.addSql(
       this.getKnex().raw(
-        `ALTER INDEX ${oldIndexName} RENAME TO ${newIndexName}`
-      )
+        `ALTER INDEX ${oldIndexName} RENAME TO ${newIndexName}`,
+      ),
     );
   }
 
   renameSequence(oldSequenceName: string, newSequenceName: string) {
     this.addSql(
       this.getKnex().raw(
-        `ALTER SEQUENCE ${oldSequenceName} RENAME TO ${newSequenceName}`
-      )
+        `ALTER SEQUENCE ${oldSequenceName} RENAME TO ${newSequenceName}`,
+      ),
     );
   }
 
   renameTable(oldTableName: string, newTableName: string) {
     this.addSql(
       this.getKnex().raw(
-        `ALTER TABLE ${oldTableName} RENAME TO ${newTableName}`
-      )
+        `ALTER TABLE ${oldTableName} RENAME TO ${newTableName}`,
+      ),
     );
   }
 
   renameConstraint(
     tableName: string,
     oldConstraint: string,
-    newConstraint: string
+    newConstraint: string,
   ) {
     this.addSql(
       this.getKnex().raw(
-        `ALTER TABLE ${tableName} RENAME CONSTRAINT ${oldConstraint} TO ${newConstraint}`
-      )
+        `ALTER TABLE ${tableName} RENAME CONSTRAINT ${oldConstraint} TO ${newConstraint}`,
+      ),
     );
   }
 
   renameColumn(tableName: string, oldColumn: string, newColumn: string) {
     this.addSql(
       this.getKnex().raw(
-        `ALTER TABLE ${tableName} RENAME COLUMN ${oldColumn} TO ${newColumn}`
-      )
+        `ALTER TABLE ${tableName} RENAME COLUMN ${oldColumn} TO ${newColumn}`,
+      ),
     );
   }
 

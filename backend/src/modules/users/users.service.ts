@@ -94,7 +94,10 @@ export class UsersService {
     );
 
     if (user.avatar) {
-      user.avatar = await this.minioService.getFileUrl(BUCKET_NAME, user.avatar);
+      user.avatar = await this.minioService.getFileUrl(
+        BUCKET_NAME,
+        user.avatar,
+      );
     }
     if (user.profile?.cover_avatar) {
       user.profile.cover_avatar = await this.minioService.getFileUrl(
