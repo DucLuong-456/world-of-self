@@ -10,7 +10,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLogoutMutation } from "@/hooks/user/useLoginMutation";
 import { useAuthStore } from "@/store/authStore";
-import { LogOut, Settings, User } from "lucide-react";
+import { GemWidget } from "@/components/gem/GemWidget";
+import { LogOut, Settings, Store, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -37,7 +38,19 @@ const Header = () => {
           Zinze
         </h1>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {/* Shop button */}
+          <button
+            onClick={() => router.push("/shop")}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border hover:bg-muted text-sm font-medium text-muted-foreground hover:text-foreground transition-all"
+          >
+            <Store className="h-4 w-4" />
+            <span className="hidden sm:inline">Shop</span>
+          </button>
+
+          {/* Gem wallet widget */}
+          <GemWidget />
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="outline-none">

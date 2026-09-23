@@ -13,6 +13,12 @@ import { PostsModule } from './modules/posts/posts.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { VideosModule } from './modules/videos/videos.module';
 import { MinioModule } from '@modules/minio/minio.module';
+import { GemWalletModule } from './modules/gem-wallet/gem-wallet.module';
+import { ItemsModule } from './modules/items/items.module';
+import { UserItemsModule } from './modules/user-items/user-items.module';
+import { DailyCheckInModule } from './modules/daily-checkin/daily-checkin.module';
+import { SpinModule } from './modules/spin/spin.module';
+import { GamesModule } from './modules/games/games.module';
 
 @Module({
   imports: [
@@ -37,6 +43,12 @@ import { MinioModule } from '@modules/minio/minio.module';
     PostsModule,
     VideosModule,
     MinioModule,
+    GemWalletModule,
+    ItemsModule,
+    UserItemsModule,
+    DailyCheckInModule,
+    SpinModule,
+    GamesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
