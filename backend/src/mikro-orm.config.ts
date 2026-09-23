@@ -35,6 +35,10 @@ export default defineConfig({
     },
   ],
   preferReadReplicas: true,
+  /**
+   * Debug query
+   */
+  // debug: ['query'],
   extensions: [Migrator, SeedManager],
   allowGlobalContext: false,
   autoJoinOneToOneOwner: false,
