@@ -5,8 +5,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 export class SwaggerAppModule {
   static setup(app: INestApplication) {
     const initialConfig = new DocumentBuilder()
-      .setTitle('Beta api')
-      .setDescription(' console API documents')
+      .setTitle('World of Self for Study API')
+      .setDescription('World of Self API documents')
       .setVersion('1.0')
       .addBearerAuth(
         { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
