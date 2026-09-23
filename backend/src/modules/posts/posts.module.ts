@@ -9,6 +9,9 @@ import { User } from '@entities/User';
 import { PostReact } from '@entities/PostReact';
 import { UserProfile } from '@entities/UserProfile';
 import { MinioModule } from '@modules/minio/minio.module';
+import { BullModule } from '@nestjs/bull';
+import { QueueName } from '../../queue/queueName.enum';
+import { QueueModule } from 'src/queue/queue.module';
 
 @Module({
   imports: [
@@ -21,6 +24,10 @@ import { MinioModule } from '@modules/minio/minio.module';
       PostTemplate,
     ]),
     MinioModule,
+    BullModule.registerQueue({
+      name: QueueName.AiQueue,
+    }),
+    QueueModule,
   ],
   controllers: [PostsController],
   providers: [PostsService],

@@ -20,8 +20,14 @@ export class Post extends CustomBaseEntityWithDeletedAt {
   @Property({ persist: false })
   is_reacted?: boolean = false;
 
-  @Property()
+  @Property({ type: 'text' })
   content: string;
+
+  @Property({ type: 'text', nullable: true })
+  summary?: string;
+
+  @Property({ type: 'array', nullable: true })
+  tags?: string[];
 
   @Property({ type: 'int', default: 0 })
   react_count: number;
