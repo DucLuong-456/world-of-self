@@ -12,7 +12,8 @@ services:
     env_file:
       - ./backend/.env
     depends_on:
-      - postgres
+      - postgres-primary
+      - postgres-replica
       - redis
     restart: unless-stopped
   client:
@@ -28,16 +29,38 @@ services:
     env_file:
       - ./frontend/.env
     restart: unless-stopped
-  postgres:
-    image: postgres:15
-    container_name: wos-postgres
+  postgres-primary:
+    image: bitnami/postgresql:latest
+    container_name: wos-postgres-primary
     restart: always
     ports:
       - "5472:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    env_file:
-      - ./backend/.env
+      - postgres_primary_data:/bitnami/postgresql
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=123456
+      - POSTGRESQL_DATABASE=wso-local
+  postgres-replica:
+    image: bitnami/postgresql:latest
+    container_name: wos-postgres-replica
+    restart: always
+    ports:
+      - "5473:5432"
+    depends_on:
+      - postgres-primary
+    volumes:
+      - postgres_replica_data:/bitnami/postgresql
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password
+      - POSTGRESQL_MASTER_HOST=postgres-primary
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - POSTGRESQL_PASSWORD=123456
   minio:
     image: quay.io/minio/minio:latest
     container_name: wos-minio
@@ -51,6 +74,7 @@ services:
     volumes:
       - minio_data:/data
     restart: unless-stopped
+
   redis:
     image: redis:7-alpine
     container_name: wos-redis
@@ -58,5 +82,6 @@ services:
       - "6379:6379"
     restart: unless-stopped
 volumes:
-  postgres_data:
+  postgres_primary_data:
+  postgres_replica_data:
   minio_data:

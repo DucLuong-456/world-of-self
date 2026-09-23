@@ -27,6 +27,14 @@ export default defineConfig({
   port: Number(process.env.POSTGRES_PORT) || 5432,
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
+  replicas: [
+    {
+      name: 'read-replica-1',
+      host: process.env.POSTGRES_REPLICA_HOST,
+      port: Number(process.env.POSTGRES_REPLICA_PORT) || 5432,
+    },
+  ],
+  preferReadReplicas: true,
   extensions: [Migrator, SeedManager],
   allowGlobalContext: false,
   autoJoinOneToOneOwner: false,
