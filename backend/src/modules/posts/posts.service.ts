@@ -19,6 +19,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { BUCKET_NAME } from '@modules/minio/minio.config';
 import { MinioService } from '@modules/minio/minio.service';
 import { PaginatedPosts } from '@dtos/pagination.dto';
+import { QueueService } from '../../queue/queue.service';
 
 const MAX_IMAGES = 10;
 const MAX_TEMPLATE_CONTENT_LENGTH = 150;
@@ -39,6 +40,7 @@ export class PostsService {
     private em: EntityManager,
     @Inject(REQUEST) protected request: Request,
     private readonly minioService: MinioService,
+    private readonly queueService: QueueService,
   ) {}
 
   async getPosts(data: SearchPostDto): Promise<PaginatedPosts> {
@@ -194,6 +196,10 @@ export class PostsService {
       }
 
       await this.em.commit();
+
+      if (post.content && post.content.length > 50) {
+        await this.queueService.addSummarizePostJob(post.id);
+      }
     } catch (error) {
       await this.em.rollback();
       throw error;

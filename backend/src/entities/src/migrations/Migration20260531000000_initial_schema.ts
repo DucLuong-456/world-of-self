@@ -80,7 +80,10 @@ export class Migration20260531000000_initial_schema extends MigrationWithTimesta
       table.string('bio').nullable().defaultTo(null);
       table.string('location').nullable().defaultTo(null);
       table.string('website').nullable().defaultTo(null);
-      table.dateTime('date_of_birth', { useTz: true }).nullable().defaultTo(null);
+      table
+        .dateTime('date_of_birth', { useTz: true })
+        .nullable()
+        .defaultTo(null);
       table.string('cover_avatar').nullable().defaultTo(null);
       table.string('profession').nullable().defaultTo(null);
       table.string('company').nullable().defaultTo(null);
