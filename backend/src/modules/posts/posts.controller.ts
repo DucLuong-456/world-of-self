@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,9 +19,11 @@ import {
   BaseResponse,
   PagingResponse,
 } from 'src/interceptors/transform.interceptor';
+import { ForcePrimaryInterceptor } from 'src/interceptors/force-primary.interceptor';
 import { CreatePostDto } from './dto/create-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
 import { PostsService } from './posts.service';
+import { QueueService } from 'src/queue/queue.service';
 
 const MAX_IMAGES = 10;
 const MAX_FILE_SIZE = 1024 * 1024 * 5; // 5MB
@@ -28,7 +31,10 @@ const MAX_FILE_SIZE = 1024 * 1024 * 5; // 5MB
 @Auth(UserRole.User)
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly queueService: QueueService,
+  ) {}
 
   @Get()
   async getPosts(@Query() data: SearchPostDto) {
@@ -42,9 +48,22 @@ export class PostsController {
     return new BaseResponse(templates);
   }
 
+  @Post('/export')
+  @Auth()
+  async exportPosts(@Req() req) {
+    const userId = req.user.id;
+    // Add task to export queue
+    await this.queueService.addJob({ userId });
+    return new BaseResponse({
+      message: 'Quá trình trích xuất đang diễn ra trong nền.',
+    });
+  }
+
   @Get('/:id')
-  getPost(@Param('id') postId: string) {
-    return this.postsService.getPost(postId);
+  @UseInterceptors(ForcePrimaryInterceptor)
+  async getPost(@Param('id') postId: string) {
+    const post = await this.postsService.getPost(postId);
+    return new BaseResponse(post);
   }
 
   @Post()

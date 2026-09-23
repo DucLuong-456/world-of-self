@@ -9,6 +9,7 @@ import { User } from '@entities/User';
 import { PostReact } from '@entities/PostReact';
 import { UserProfile } from '@entities/UserProfile';
 import { MinioModule } from '@modules/minio/minio.module';
+import { QueueModule } from 'src/queue/queue.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MinioModule } from '@modules/minio/minio.module';
       PostTemplate,
     ]),
     MinioModule,
+    QueueModule,
   ],
   controllers: [PostsController],
   providers: [PostsService],
