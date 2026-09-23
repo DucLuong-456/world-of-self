@@ -3,9 +3,7 @@ import {
   BadRequestException,
   Body,
   Controller,
-  FileTypeValidator,
   Get,
-  MaxFileSizeValidator,
   Param,
   Patch,
   Post,
@@ -13,13 +11,16 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiConsumes } from '@nestjs/swagger';
 import { Auth } from 'src/decorators/auth.decorator';
+import {
+  BaseResponse,
+  PagingResponse,
+} from 'src/interceptors/transform.interceptor';
 import { CreatePostDto } from './dto/create-post.dto';
 import { SearchPostDto } from './dto/search-post.dto';
 import { PostsService } from './posts.service';
-import { ApiConsumes } from '@nestjs/swagger';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { BaseResponse, PagingResponse } from 'src/interceptors/transform.interceptor';
 
 const MAX_IMAGES = 10;
 const MAX_FILE_SIZE = 1024 * 1024 * 5; // 5MB
