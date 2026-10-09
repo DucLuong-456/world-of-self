@@ -11,6 +11,9 @@ import { Post } from './Post';
 import { PostReact } from './PostReact';
 import { UserRelationship } from './UserRelationship';
 import { UserProfile } from './UserProfile';
+import { ConversationMember } from './ConversationMember';
+import { Message } from './Message';
+import { MessageReaction } from './MessageReaction';
 
 @Entity({ tableName: 'users' })
 export class User extends CustomBaseEntityWithDeletedAt {
@@ -55,4 +58,22 @@ export class User extends CustomBaseEntityWithDeletedAt {
     mappedBy: (profile) => profile.user,
   })
   profile: UserProfile;
+
+  @OneToMany({
+    entity: () => ConversationMember,
+    mappedBy: (member) => member.user,
+  })
+  conversation_members = new Collection<ConversationMember>(this);
+
+  @OneToMany({
+    entity: () => Message,
+    mappedBy: (msg) => msg.sender,
+  })
+  messages = new Collection<Message>(this);
+
+  @OneToMany({
+    entity: () => MessageReaction,
+    mappedBy: (reaction) => reaction.user,
+  })
+  message_reactions = new Collection<MessageReaction>(this);
 }

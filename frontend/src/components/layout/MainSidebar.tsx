@@ -8,6 +8,7 @@ import {
   Settings,
   LogOut,
   Search,
+  MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,6 +21,7 @@ import { useAuthStore } from "@/store/authStore";
 const navItems = [
   { id: "home", label: "Home", icon: Home, href: "/" },
   { id: "friends", label: "Friends", icon: Users, href: "/friends" },
+  { id: "messager", label: "Messager", icon: MessageCircle, href: "/messager" },
   {
     id: "notifications",
     label: "Notifications",

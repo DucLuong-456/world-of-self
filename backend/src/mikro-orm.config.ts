@@ -9,6 +9,11 @@ import { PostImage } from '@entities/PostImage';
 import { PostTemplate } from '@entities/PostTemplate';
 import { StoredImage } from '@entities/StoredImage';
 import { UserRelationship } from '@entities/UserRelationship';
+import { Conversation } from '@entities/Conversation';
+import { ConversationMember } from '@entities/ConversationMember';
+import { Message } from '@entities/Message';
+import { MessageAttachment } from '@entities/MessageAttachment';
+import { MessageReaction } from '@entities/MessageReaction';
 dotenv.config();
 
 export default defineConfig({
@@ -20,6 +25,11 @@ export default defineConfig({
     PostTemplate,
     StoredImage,
     UserRelationship,
+    Conversation,
+    ConversationMember,
+    Message,
+    MessageAttachment,
+    MessageReaction,
   ],
   entitiesTs: ['./src/entities/src/entities'],
   host: process.env.POSTGRES_HOST,
@@ -40,7 +50,7 @@ export default defineConfig({
    */
   // debug: ['query'],
   extensions: [Migrator, SeedManager],
-  allowGlobalContext: false,
+  allowGlobalContext: true,
   autoJoinOneToOneOwner: false,
   ignoreUndefinedInQuery: true,
   discovery: {

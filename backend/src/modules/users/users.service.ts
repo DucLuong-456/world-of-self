@@ -72,6 +72,14 @@ export class UsersService {
       },
     );
 
+    await Promise.all(
+      users.map(async (u) => {
+        if (u.avatar) {
+          u.avatar = await this.minioService.getFileUrl(BUCKET_NAME, u.avatar);
+        }
+      }),
+    );
+
     return {
       users,
       paging: {

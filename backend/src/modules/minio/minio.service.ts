@@ -59,7 +59,15 @@ export class MinioService {
     );
   }
 
-  async deleteFile(bucketName: string, fileName: string) {
+  async deleteFile(bucketName: string, fileName?: string | null) {
+    if (
+      !fileName ||
+      fileName.startsWith('http://') ||
+      fileName.startsWith('https://')
+    ) {
+      return;
+    }
+
     try {
       await this.s3Client.send(
         new DeleteObjectCommand({
@@ -75,7 +83,15 @@ export class MinioService {
     }
   }
 
-  async getFileUrl(bucketName: string, fileName: string) {
+  async getFileUrl(
+    bucketName: string,
+    fileName?: string | null,
+  ): Promise<string> {
+    if (!fileName) return '';
+    if (fileName.startsWith('http://') || fileName.startsWith('https://')) {
+      return fileName;
+    }
+
     const publicEndpoint =
       process.env.S3_PUBLIC_ENDPOINT || process.env.S3_ENDPOINT;
     const S3_PUBLIC_ACCESS_ENV_LOCAL = true;

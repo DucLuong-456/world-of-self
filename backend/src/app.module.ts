@@ -14,6 +14,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { VideosModule } from './modules/videos/videos.module';
 import { MinioModule } from '@modules/minio/minio.module';
 import { GeminiAiModule } from './modules/gemini-ai/gemini-ai.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { GeminiAiModule } from './modules/gemini-ai/gemini-ai.module';
     VideosModule,
     MinioModule,
     GeminiAiModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
