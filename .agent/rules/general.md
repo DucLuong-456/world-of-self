@@ -16,3 +16,7 @@ Khi hỗ trợ người dùng, Agent cần tuân theo các quy định định d
 3. **Ghi đè file (File Editing):**
    - Luôn review cấu trúc file hiện tại bằng lsof hoặc view_file trước khi sửa một file mới.
    - Thêm comment tại nơi vừa sửa chữa nếu logic phức tạp.
+
+4. **TypeScript & Typing:**
+   - Tuyệt đối **không dùng `any`** hoặc `as any` trong toàn bộ codebase (cả Frontend và Backend).
+   - Luôn định nghĩa Interface, Type, Generic hoặc DTO cụ thể. Trường hợp chưa xác định kiểu bắt buộc dùng `unknown` kèm type guard hoặc schema validation.
