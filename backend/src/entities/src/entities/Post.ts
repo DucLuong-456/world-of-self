@@ -62,4 +62,7 @@ export class Post extends CustomBaseEntityWithDeletedAt {
     mappedBy: (post_react) => post_react.post,
   })
   post_react = new Collection<PostReact>(this);
+
+  @OneToMany('Comment', 'post')
+  comments = new Collection<any>(this);
 }

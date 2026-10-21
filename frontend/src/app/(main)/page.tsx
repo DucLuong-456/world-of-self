@@ -46,6 +46,7 @@ export default function HomePage() {
           posts.map((post) => (
             <PostCard
               key={post.id}
+              postId={post.id}
               author={{
                 name: post.user?.user_name ?? "Ẩn danh",
                 username: post.user?.user_name
