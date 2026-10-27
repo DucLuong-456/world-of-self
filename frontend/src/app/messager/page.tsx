@@ -11,9 +11,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   MessageType,
   Message,
+  Sticker,
   SocketResponse,
   JoinRoomResponseData,
 } from "@/types/chat";
+import { StickerPicker } from "@/components/chat/StickerPicker";
 import { User } from "@/types/user";
 import { v4 as uuidv4 } from "uuid";
 import { apiClient } from "@/lib/axios";
@@ -263,6 +265,48 @@ export default function MessagerPage() {
     );
   };
 
+  const handleSendSticker = (sticker: Sticker) => {
+    if (!activeConversationId || !user || !socket) {
+      return;
+    }
+
+    const tempId = uuidv4();
+    const messagePayload: Message = {
+      id: tempId,
+      temp_id: tempId,
+      conversation_id: activeConversationId,
+      sender_id: user.id,
+      content: sticker.image_url,
+      type: MessageType.STICKER,
+      created_at: new Date().toISOString(),
+      isTemp: true,
+      sender: user,
+    };
+
+    // Optimistic Update
+    addMessage(activeConversationId, messagePayload);
+    setTimeout(() => {
+      scrollToBottom("smooth");
+    }, 50);
+
+    socket.emit(
+      "chat:send_message",
+      {
+        conversation_id: activeConversationId,
+        content: sticker.image_url,
+        type: MessageType.STICKER,
+        temp_id: tempId,
+      },
+      (res: SocketResponse<Message>) => {
+        if (res.status === "success") {
+          confirmMessage(activeConversationId, tempId, res.data);
+        } else {
+          console.error("Failed to send sticker:", res?.message);
+        }
+      },
+    );
+  };
+
   const activeMessages = activeConversationId
     ? messages[activeConversationId] || []
     : [];
@@ -352,7 +396,9 @@ export default function MessagerPage() {
                     {conv.name || "Conversation"}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
-                    {conv.last_message?.content || "Chưa có tin nhắn"}
+                    {conv.last_message?.type === MessageType.STICKER
+                      ? "[Nhãn dán]"
+                      : conv.last_message?.content || "Chưa có tin nhắn"}
                   </p>
                 </div>
               </div>
@@ -442,15 +488,27 @@ export default function MessagerPage() {
                           </AvatarFallback>
                         </Avatar>
                       )}
-                      <div
-                        className={`max-w-[70%] px-4 py-2 rounded-2xl ${
-                          isMe
-                            ? "bg-primary text-primary-foreground rounded-tr-sm"
-                            : "bg-card border border-border text-card-foreground rounded-tl-sm"
-                        } ${msg.isTemp ? "opacity-70" : ""}`}
-                      >
-                        <p className="text-sm break-words">{msg.content}</p>
-                      </div>
+                      {msg.type === MessageType.STICKER ? (
+                        <div
+                          className={`p-1 ${msg.isTemp ? "opacity-70" : ""}`}
+                        >
+                          <img
+                            src={resolveAvatarUrl(msg.content)}
+                            alt="Sticker"
+                            className="w-28 h-28 object-contain select-none"
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className={`max-w-[70%] px-4 py-2 rounded-2xl ${
+                            isMe
+                              ? "bg-primary text-primary-foreground rounded-tr-sm"
+                              : "bg-card border border-border text-card-foreground rounded-tl-sm"
+                          } ${msg.isTemp ? "opacity-70" : ""}`}
+                        >
+                          <p className="text-sm break-words">{msg.content}</p>
+                        </div>
+                      )}
                       {isMe && (
                         <Avatar className="h-8 w-8 mt-1">
                           <AvatarImage src={resolveAvatarUrl(user?.avatar)} />
@@ -467,7 +525,11 @@ export default function MessagerPage() {
             </ScrollArea>
 
             <div className="p-4 bg-card border-t border-border pr-20">
-              <form onSubmit={handleSendMessage} className="flex gap-2">
+              <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                <StickerPicker
+                  onSelectSticker={handleSendSticker}
+                  disabled={!isConnected}
+                />
                 <Input
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}

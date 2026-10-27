@@ -87,6 +87,12 @@ export class ChatService {
             msg.sender.avatar,
           );
         }
+        if (msg.type === MessageType.STICKER && msg.content) {
+          msg.content = await this.minioService.getFileUrl(
+            BUCKET_NAME,
+            msg.content,
+          );
+        }
       }),
     );
     return { items, total };
@@ -202,9 +208,20 @@ export class ChatService {
         );
       }
 
+      const serializedMessage = wrap(message).toObject();
+      if (
+        serializedMessage.type === MessageType.STICKER &&
+        serializedMessage.content
+      ) {
+        serializedMessage.content = await this.minioService.getFileUrl(
+          BUCKET_NAME,
+          serializedMessage.content,
+        );
+      }
+
       // Return message with temp_id so the client can match the optimistic update
       return {
-        ...wrap(message).toObject(),
+        ...serializedMessage,
         conversation_id: conversationId,
         sender_id: senderId,
         temp_id: tempId,

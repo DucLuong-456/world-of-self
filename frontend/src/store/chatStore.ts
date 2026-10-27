@@ -55,6 +55,9 @@ export const useChatStore = createStore<StateChat & ActionsChat>()((set, get) =>
         return state;
       }
       return {
+        conversations: state.conversations.map((conv) =>
+          conv.id === conversationId ? { ...conv, last_message: message } : conv
+        ),
         messages: {
           ...state.messages,
           [conversationId]: [message, ...existing],
@@ -67,6 +70,12 @@ export const useChatStore = createStore<StateChat & ActionsChat>()((set, get) =>
     set((state) => {
       const existing = state.messages[conversationId] || [];
       return {
+        conversations: state.conversations.map((conv) =>
+          conv.id === conversationId &&
+          (conv.last_message?.id === tempId || conv.last_message?.temp_id === tempId)
+            ? { ...conv, last_message: realMessage }
+            : conv
+        ),
         messages: {
           ...state.messages,
           [conversationId]: existing.map((m) =>

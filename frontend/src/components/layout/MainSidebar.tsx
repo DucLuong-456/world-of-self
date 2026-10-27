@@ -9,6 +9,7 @@ import {
   LogOut,
   Search,
   MessageCircle,
+  Sticker,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -40,6 +41,19 @@ export const MainSidebar = () => {
   const { user } = useAuthStore();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  const displayedNavItems =
+    user?.role === "admin"
+      ? [
+          ...navItems,
+          {
+            id: "admin-stickers",
+            label: "Quản lý Sticker",
+            icon: Sticker,
+            href: "/admin/stickers",
+          },
+        ]
+      : navItems;
+
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-border bg-sidebar">
       {/* Logo */}
@@ -66,7 +80,7 @@ export const MainSidebar = () => {
       {/* Navigation */}
       <nav className="flex-1 px-3">
         <ul className="space-y-1">
-          {navItems.map((item) => {
+          {displayedNavItems.map((item) => {
             const Icon = item.icon;
             const isActive =
               pathname === item.href ||

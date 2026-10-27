@@ -14,6 +14,8 @@ import { ConversationMember } from '@entities/ConversationMember';
 import { Message } from '@entities/Message';
 import { MessageAttachment } from '@entities/MessageAttachment';
 import { MessageReaction } from '@entities/MessageReaction';
+import { StickerPack } from '@entities/StickerPack';
+import { Sticker } from '@entities/Sticker';
 dotenv.config();
 
 export default defineConfig({
@@ -30,6 +32,8 @@ export default defineConfig({
     Message,
     MessageAttachment,
     MessageReaction,
+    StickerPack,
+    Sticker,
   ],
   entitiesTs: ['./src/entities/src/entities'],
   host: process.env.POSTGRES_HOST,

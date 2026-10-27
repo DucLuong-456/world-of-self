@@ -3,6 +3,7 @@ import { User } from './user';
 export enum MessageType {
   TEXT = 'TEXT',
   MEDIA = 'MEDIA',
+  STICKER = 'STICKER',
   SYSTEM = 'SYSTEM',
 }
 
@@ -42,4 +43,24 @@ export type SocketResponse<T> = SocketSuccessResponse<T> | SocketErrorResponse;
 
 export interface JoinRoomResponseData {
   roomId: string;
+}
+
+export interface Sticker {
+  id: string;
+  pack_id?: string;
+  name?: string | null;
+  image_url: string;
+  sort_order: number;
+  created_at?: string;
+}
+
+export interface StickerPack {
+  id: string;
+  name: string;
+  description?: string | null;
+  icon_url?: string | null;
+  is_active: boolean;
+  sort_order: number;
+  stickers: Sticker[];
+  created_at?: string;
 }

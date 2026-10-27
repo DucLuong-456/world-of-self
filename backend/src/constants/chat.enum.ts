@@ -11,5 +11,6 @@ export enum ConversationMemberRole {
 export enum MessageType {
   TEXT = 'TEXT',
   MEDIA = 'MEDIA',
+  STICKER = 'STICKER',
   SYSTEM = 'SYSTEM',
 }
