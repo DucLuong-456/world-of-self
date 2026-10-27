@@ -110,6 +110,14 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@modules/(.*)$": "<rootDir>/modules/$1",
+      "^@entities/(.*)$": "<rootDir>/entities/src/entities/$1",
+      "^@constants/(.*)$": "<rootDir>/constants/$1",
+      "^@dtos/(.*)$": "<rootDir>/dtos/$1",
+      "^@exceptions/(.*)$": "<rootDir>/exceptions/$1",
+      "^src/(.*)$": "<rootDir>/$1"
+    }
   }
 }

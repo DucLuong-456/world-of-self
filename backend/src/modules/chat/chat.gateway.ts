@@ -11,6 +11,7 @@ import { Server, Socket } from 'socket.io';
 import { UseGuards } from '@nestjs/common';
 import { WsJwtGuard, AuthenticatedSocket } from '../auth/guard/ws-jwt.guard';
 import { ChatService } from './chat.service';
+import { WsSendMessageDto } from './dto/send-message.dto';
 
 @WebSocketGateway({
   cors: {
@@ -69,12 +70,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('chat:send_message')
   async handleSendMessage(
     @MessageBody()
-    data: {
-      conversation_id: string;
-      content: string;
-      type?: string;
-      temp_id?: string;
-    },
+    data: WsSendMessageDto,
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     try {

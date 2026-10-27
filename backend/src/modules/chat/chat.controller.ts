@@ -5,8 +5,9 @@ import { User } from '@entities/User';
 import { Conversation } from '@entities/Conversation';
 import { UserRole } from '@constants/userRole.enum';
 import { Auth } from 'src/decorators/auth.decorator';
+import { SendMessageDto } from './dto/send-message.dto';
 
-@Auth(UserRole.User)
+@Auth(UserRole.User, UserRole.Admin)
 @Controller('chat')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
@@ -60,7 +61,7 @@ export class ChatController {
   async sendMessage(
     @Req() req: Request,
     @Param('id') conversationId: string,
-    @Body() body: { content: string; type?: string },
+    @Body() body: SendMessageDto,
   ) {
     const user = req.user as User;
     const data = await this.chatService.sendMessage({

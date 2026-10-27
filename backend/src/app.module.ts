@@ -15,6 +15,8 @@ import { VideosModule } from './modules/videos/videos.module';
 import { MinioModule } from '@modules/minio/minio.module';
 import { GeminiAiModule } from './modules/gemini-ai/gemini-ai.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { StickerModule } from './modules/sticker/sticker.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { ChatModule } from './modules/chat/chat.module';
     MinioModule,
     GeminiAiModule,
     ChatModule,
+    StickerModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
